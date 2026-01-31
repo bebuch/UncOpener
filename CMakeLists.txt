@@ -14,6 +14,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 option(UNCOPENER_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 
 include(cmake/CompilerWarnings.cmake)
+include(cmake/ClangFormat.cmake)
+include(cmake/ClangTidy.cmake)
 
 enable_testing()
 
