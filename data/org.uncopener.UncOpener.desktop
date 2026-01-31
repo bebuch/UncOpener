@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=UncOpener
+Comment=Open UNC paths from custom URL schemes
+Exec=uncopener %u
+Icon=uncopener
+Terminal=false
+Categories=Utility;
+MimeType=x-scheme-handler/uncopener;
+StartupWMClass=uncopener

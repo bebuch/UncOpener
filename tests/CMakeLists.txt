@@ -42,19 +42,24 @@ set_tests_properties(uncopener_resource_tests PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
 
-# Test for dialog window icons
-add_executable(uncopener_dialog_tests
+# Test for dialog and window icons
+add_executable(uncopener_gui_tests
     test_dialogs.cpp
     ../src/app/ErrorDialog.cpp
     ../src/app/ErrorDialog.hpp
+    ../src/app/MainWindow.cpp
+    ../src/app/MainWindow.hpp
+    ../src/app/AppIcon.cpp
+    ../src/app/AppIcon.hpp
     ../src/app/resources.qrc
 )
 
-target_include_directories(uncopener_dialog_tests PRIVATE
+target_include_directories(uncopener_gui_tests PRIVATE
     ../src/app
 )
 
-target_link_libraries(uncopener_dialog_tests PRIVATE
+target_link_libraries(uncopener_gui_tests PRIVATE
+    uncopener_core
     Qt6::Core
     Qt6::Gui
     Qt6::Svg
@@ -62,9 +67,9 @@ target_link_libraries(uncopener_dialog_tests PRIVATE
     Qt6::Test
 )
 
-set_project_warnings(uncopener_dialog_tests)
+set_project_warnings(uncopener_gui_tests)
 
-add_test(NAME uncopener_dialog_tests COMMAND uncopener_dialog_tests)
-set_tests_properties(uncopener_dialog_tests PROPERTIES
+add_test(NAME uncopener_gui_tests COMMAND uncopener_gui_tests)
+set_tests_properties(uncopener_gui_tests PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
