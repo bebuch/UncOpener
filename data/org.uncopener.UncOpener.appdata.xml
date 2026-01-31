@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.uncopener.UncOpener</id>
+  <name>UncOpener</name>
+  <summary>Open UNC paths from custom URL schemes</summary>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="org.uncopener">
+    <name>UncOpener Developers</name>
+  </developer>
+  <description>
+    <p>
+      UncOpener allows you to open Windows UNC paths (like \\server\share\file.txt)
+      from web browsers and other applications using a custom URL scheme.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Custom URL scheme registration (default: uncopener://)</li>
+      <li>Security allow-list for UNC paths</li>
+      <li>Filetype whitelist/blacklist policies</li>
+      <li>Cross-platform support (Linux and Windows)</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">org.uncopener.UncOpener.desktop</launchable>
+  <provides>
+    <binary>uncopener</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+</component>

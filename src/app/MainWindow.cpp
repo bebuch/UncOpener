@@ -1,5 +1,6 @@
 #include "MainWindow.hpp"
 
+#include "AppIcon.hpp"
 #include "SecurityPolicy.hpp"
 
 #include <QFormLayout>
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), m_registry(uncopener::SchemeRegistry::create())
 {
     setWindowTitle("UncOpener - Configuration");
+    setWindowIcon(loadAppIcon());
     setMinimumSize(600, 700);
 
     setupUi();

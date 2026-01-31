@@ -4,6 +4,8 @@ add_executable(uncopener WIN32
     MainWindow.hpp
     ErrorDialog.cpp
     ErrorDialog.hpp
+    AppIcon.cpp
+    AppIcon.hpp
     resources.qrc
 )
 
@@ -15,3 +17,22 @@ target_link_libraries(uncopener PRIVATE
 )
 
 set_project_warnings(uncopener)
+
+# Installation rules for Linux (Wayland icons require .desktop file and installed icon)
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+
+    install(TARGETS uncopener
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+    install(FILES ${CMAKE_SOURCE_DIR}/data/org.uncopener.UncOpener.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+    )
+
+    # Install SVG icon for scalable icons
+    install(FILES ${CMAKE_SOURCE_DIR}/assets/icon.svg
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+        RENAME uncopener.svg
+    )
+endif()
