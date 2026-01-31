@@ -52,9 +52,9 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          # Run clang-tidy on all source files
+          # Run clang-tidy on all source files (excluding generated files)
           # WarningsAsErrors is set in .clang-tidy, so any warning will cause failure
-          find src -name '*.cpp' | xargs clang-tidy -p build/dev
+          find src -name '*.cpp' -print0 | xargs -0 run-clang-tidy -p build/dev
 
   build-linux-release:
     name: Build (Linux Release)
