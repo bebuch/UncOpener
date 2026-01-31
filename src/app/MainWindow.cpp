@@ -5,7 +5,6 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
-#include <QIcon>
 #include <QMessageBox>
 #include <QVBoxLayout>
 
@@ -13,7 +12,6 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), m_registry(uncopener::SchemeRegistry::create())
 {
     setWindowTitle("UncOpener - Configuration");
-    setWindowIcon(QIcon(":/icons/icon.svg"));
     setMinimumSize(600, 700);
 
     setupUi();

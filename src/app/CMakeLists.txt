@@ -4,8 +4,6 @@ add_executable(uncopener WIN32
     MainWindow.hpp
     ErrorDialog.cpp
     ErrorDialog.hpp
-    SuccessSplash.cpp
-    SuccessSplash.hpp
     resources.qrc
 )
 
