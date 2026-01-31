@@ -59,7 +59,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.6.*'
-          modules: 'qtsvg'
+          archives: 'qtbase qtsvg'
 
       - name: Configure (Release)
         run: cmake -B build/rel -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
