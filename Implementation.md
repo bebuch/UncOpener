@@ -56,15 +56,15 @@
 
 (Plain C++ library, no Qt UI logic; Qt types allowed if preferred, but keep it testable.)
 
-* [ ] Implement `ParseResult` / `ValidationResult` types with reason + remediation strings for dialogs.
-* [ ] Implement:
+* [x] Implement `ParseResult` / `ValidationResult` types with reason + remediation strings for dialogs.
+* [x] Implement:
 
   * parse input argument as URL
   * enforce `scheme://...`
   * percent-decode
   * normalization pipeline (collapse slashes, remove `.`, reject `..`, preserve trailing slash)
   * canonical UNC conversion for comparison: `\\authority\path...`
-* [ ] Unit test everything, including tricky separators and edge characters.
+* [x] Unit test everything, including tricky separators and edge characters.
 
 ### Step 5 — Security policy: UNC allow-list + filetype allow/deny lists
 
