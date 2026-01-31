@@ -122,7 +122,7 @@
 
 ### Step 9 — Handler mode UX: strict error dialogs + success flash
 
-* [ ] In one-argument mode:
+* [x] In one-argument mode:
 
   * Run validation pipeline.
   * On any error: show modal error dialog (English) with:
@@ -136,7 +136,7 @@
     * call `QDesktopServices::openUrl`
     * on failure: error dialog as above, exit 1
     * on success: show icon on green background for 1 second, exit 0
-* [ ] Add tests for error classification (unit tests) and minimal integration smoke test if possible.
+* [x] Add tests for error classification (unit tests) and minimal integration smoke test if possible.
 
 ### Step 10 — Scheme registration: Windows (HKCU)
 
