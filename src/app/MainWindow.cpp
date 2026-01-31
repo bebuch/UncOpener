@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), m_registry(uncopener::SchemeRegistry::create())
 {
     setWindowTitle("UncOpener - Configuration");
-    setWindowIcon(QIcon(":/icon.svg"));
+    setWindowIcon(QIcon(":/icons/icon.svg"));
     setMinimumSize(600, 700);
 
     setupUi();
