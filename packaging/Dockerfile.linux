@@ -1,11 +1,11 @@
 # Dockerfile for building UncOpener Linux AppImage
-# Uses Ubuntu 20.04 for wider compatibility with older distributions
+# Uses Ubuntu 24.04 for wider compatibility with older distributions
 #
 # Usage:
 #   docker build -t uncopener-builder -f packaging/Dockerfile.linux .
 #   docker run -v $(pwd):/src -v $(pwd)/dist:/dist uncopener-builder
 
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
@@ -27,9 +27,7 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Note: Ubuntu 20.04 has Qt6 in universe repository
-# If Qt6 is not available, you may need to add a PPA or use a newer base image:
-# RUN add-apt-repository ppa:okirby/qt6-backports && apt-get update
+# Note: Ubuntu 24.04 has Qt6 in the standard repositories
 
 WORKDIR /src
 

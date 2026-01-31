@@ -79,7 +79,7 @@ docker build -t uncopener-builder -f packaging/Dockerfile.linux .
 docker run -v $(pwd):/src -v $(pwd)/dist:/dist uncopener-builder
 ```
 
-This uses Ubuntu 20.04 as a base, ensuring compatibility with distributions
+This uses Ubuntu 24.04 as a base, ensuring compatibility with distributions
 from that era and newer.
 
 ### Output
