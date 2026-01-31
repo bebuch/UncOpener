@@ -146,8 +146,15 @@ jobs:
 
       - name: Generate coverage report
         run: |
+          # Create a wrapper script for llvm-cov to work with lcov
+          cat > llvm-gcov.sh << 'EOF'
+          #!/bin/bash
+          exec llvm-cov gcov "$@"
+          EOF
+          chmod +x llvm-gcov.sh
+          
           lcov --capture --directory build --output-file coverage.info \
-            --gcov-tool "llvm-cov gcov" \
+            --gcov-tool "$PWD/llvm-gcov.sh" \
             --ignore-errors mismatch,inconsistent
           lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' \
             --output-file coverage.info --ignore-errors unused
