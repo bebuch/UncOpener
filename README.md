@@ -1,5 +1,9 @@
 # UncOpener
 
+[![CI](https://github.com/bebuch/UncOpener/actions/workflows/ci.yml/badge.svg)](https://github.com/bebuch/UncOpener/actions/workflows/ci.yml)
+[![Release](https://github.com/bebuch/UncOpener/actions/workflows/release.yml/badge.svg)](https://github.com/bebuch/UncOpener/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A cross-platform Qt application that handles custom URL schemes for opening UNC network paths. This is the backend companion application for the [UncClickable](https://github.com/bebuch/UncClickable) browser extension.
 
 ## Overview
