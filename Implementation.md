@@ -206,17 +206,17 @@
 
 ### Step 15 — Upload to GitHub repo `bebuch/UncOpener`
 
-* [ ] Ensure repository name, README, and links mention it is the backend for the UncClickable extension.
-* [ ] Push to the existing remote: `https://github.com/bebuch/UncOpener` (remote already set).
+* [x] Ensure repository name, README, and links mention it is the backend for the UncClickable extension.
+* [x] Push to the existing remote: `https://github.com/bebuch/UncOpener` (remote already set).
 * [ ] Verify default branch protections and PR requirements align with the CI checks.
 
 ---
 
-## Minimal “Definition of Done” for the first usable milestone
+## Minimal "Definition of Done" for the first usable milestone
 
-* [ ] User can configure scheme + UNC allow-list in GUI.
-* [ ] Scheme can be registered/deregistered (Windows + Linux) and status is shown.
-* [ ] Clicking an extension-generated link triggers handler mode:
+* [x] User can configure scheme + UNC allow-list in GUI.
+* [x] Scheme can be registered/deregistered (Windows + Linux) and status is shown.
+* [x] Clicking an extension-generated link triggers handler mode:
 
   * strict validation
   * allow-list enforcement
