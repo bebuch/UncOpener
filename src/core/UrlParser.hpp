@@ -72,7 +72,8 @@ private:
 
     /// Normalize path: collapse slashes, remove dot segments
     /// Returns nullopt if directory traversal (..) is detected
-    [[nodiscard]] static std::optional<QString> normalizePath(const QString& path, bool& hasTrailingSlash);
+    [[nodiscard]] static std::optional<QString> normalizePath(const QString& path,
+                                                              bool& hasTrailingSlash);
 };
 
 /// Helper functions for working with ParseResult
