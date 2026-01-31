@@ -2,6 +2,7 @@
 #define UNCOPENER_MAINWINDOW_HPP
 
 #include "Config.hpp"
+#include "SchemeRegistry.hpp"
 
 #include <QComboBox>
 #include <QLabel>
@@ -9,6 +10,8 @@
 #include <QListWidget>
 #include <QMainWindow>
 #include <QPushButton>
+
+#include <memory>
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +31,8 @@ private slots:
     void onAddBlacklistEntry();
     void onRemoveBlacklistEntry();
     void onSmbUsernameChanged(const QString& text);
+    void onRegisterClicked();
+    void onUnregisterClicked();
 
 private:
     void setupUi();
@@ -35,9 +40,11 @@ private:
     void updateUiFromConfig();
     void updateConfigFromUi();
     void validateAndUpdateStatus();
+    void updateRegistrationStatus();
     void setModified(bool modified);
 
     uncopener::Config m_config;
+    std::unique_ptr<uncopener::SchemeRegistry> m_registry;
     bool m_modified = false;
 
     // Widgets
@@ -62,6 +69,11 @@ private:
     QLabel* m_configPathLabel = nullptr;
     QLabel* m_statusLabel = nullptr;
     QPushButton* m_saveButton = nullptr;
+
+    // Registration widgets
+    QLabel* m_registrationStatusLabel = nullptr;
+    QPushButton* m_registerButton = nullptr;
+    QPushButton* m_unregisterButton = nullptr;
 };
 
 #endif // UNCOPENER_MAINWINDOW_HPP

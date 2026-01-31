@@ -140,25 +140,25 @@
 
 ### Step 10 — Scheme registration: Windows (HKCU)
 
-* [ ] Implement “is registered”:
+* [x] Implement "is registered":
 
   * check per-user registration points to **current binary**.
-* [ ] Implement register/deregister actions.
-* [ ] If another binary is registered:
+* [x] Implement register/deregister actions.
+* [x] If another binary is registered:
 
   * GUI prompts user before overwrite.
-* [ ] Add unit tests for registry path computation and decision logic (mock registry access layer).
+* [x] Add unit tests for registry path computation and decision logic (mock registry access layer).
 
 ### Step 11 — Scheme registration: Linux (`.desktop` + xdg-mime)
 
-* [ ] Create per-user `.desktop` file in the standard location (`~/.local/share/applications`).
-* [ ] Register via `xdg-mime default <desktop-file> x-scheme-handler/<scheme>`.
-* [ ] Deregister removes the `.desktop` file and updates association as needed.
-* [ ] “Is registered” detection:
+* [x] Create per-user `.desktop` file in the standard location (`~/.local/share/applications`).
+* [x] Register via `xdg-mime default <desktop-file> x-scheme-handler/<scheme>`.
+* [x] Deregister removes the `.desktop` file and updates association as needed.
+* [x] "Is registered" detection:
 
   * check existence and contents of desktop file point to current binary
-  * verify association files/state (as per “check the files” requirement)
-* [ ] Tests for desktop file generation and detection logic.
+  * verify association files/state (as per "check the files" requirement)
+* [x] Tests for desktop file generation and detection logic.
 
 ### Step 12 — Icons pipeline: SVG → platform assets, committed outputs
 

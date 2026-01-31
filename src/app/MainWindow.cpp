@@ -8,10 +8,11 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent), m_registry(uncopener::SchemeRegistry::create())
 {
     setWindowTitle("UncOpener - Configuration");
-    setMinimumSize(600, 700);
+    setMinimumSize(600, 800);
 
     setupUi();
     loadConfig();
@@ -140,6 +141,27 @@ void MainWindow::setupUi()
     pathLayout->addRow("Config file:", m_configPathLabel);
     mainLayout->addWidget(pathGroup);
 
+    // Scheme registration section
+    auto* registrationGroup = new QGroupBox("Scheme Registration", centralWidget);
+    auto* registrationLayout = new QVBoxLayout(registrationGroup);
+
+    m_registrationStatusLabel = new QLabel(registrationGroup);
+    m_registrationStatusLabel->setWordWrap(true);
+    registrationLayout->addWidget(m_registrationStatusLabel);
+
+    auto* registrationButtonLayout = new QHBoxLayout();
+    m_registerButton = new QPushButton("Register Scheme", registrationGroup);
+    m_unregisterButton = new QPushButton("Unregister Scheme", registrationGroup);
+    registrationButtonLayout->addWidget(m_registerButton);
+    registrationButtonLayout->addWidget(m_unregisterButton);
+    registrationButtonLayout->addStretch();
+    registrationLayout->addLayout(registrationButtonLayout);
+
+    connect(m_registerButton, &QPushButton::clicked, this, &MainWindow::onRegisterClicked);
+    connect(m_unregisterButton, &QPushButton::clicked, this, &MainWindow::onUnregisterClicked);
+
+    mainLayout->addWidget(registrationGroup);
+
     // Status and save
     auto* bottomLayout = new QHBoxLayout();
     m_statusLabel = new QLabel(centralWidget);
@@ -185,6 +207,7 @@ void MainWindow::updateUiFromConfig()
 #endif
 
     validateAndUpdateStatus();
+    updateRegistrationStatus();
 }
 
 void MainWindow::updateConfigFromUi()
@@ -288,6 +311,7 @@ void MainWindow::onSchemeNameChanged(const QString& /*text*/)
 {
     setModified(true);
     validateAndUpdateStatus();
+    updateRegistrationStatus();
 }
 
 void MainWindow::onAddUncEntry()
@@ -395,4 +419,129 @@ void MainWindow::onRemoveBlacklistEntry()
 void MainWindow::onSmbUsernameChanged(const QString& /*text*/)
 {
     setModified(true);
+}
+
+void MainWindow::updateRegistrationStatus()
+{
+    QString schemeName = m_schemeNameEdit->text().trimmed();
+
+    if (schemeName.isEmpty())
+    {
+        m_registrationStatusLabel->setText("Enter a scheme name to check registration status.");
+        m_registrationStatusLabel->setStyleSheet("");
+        m_registerButton->setEnabled(false);
+        m_unregisterButton->setEnabled(false);
+        return;
+    }
+
+    uncopener::RegistrationStatus status = m_registry->checkRegistration(schemeName);
+
+    switch (status)
+    {
+    case uncopener::RegistrationStatus::NotRegistered:
+        m_registrationStatusLabel->setText(
+            QString("Scheme '%1' is not registered.").arg(schemeName));
+        m_registrationStatusLabel->setStyleSheet("color: gray;");
+        m_registerButton->setEnabled(true);
+        m_unregisterButton->setEnabled(false);
+        break;
+
+    case uncopener::RegistrationStatus::RegisteredToThisBinary:
+        m_registrationStatusLabel->setText(
+            QString("Scheme '%1' is registered to this application.").arg(schemeName));
+        m_registrationStatusLabel->setStyleSheet("color: green;");
+        m_registerButton->setEnabled(false);
+        m_unregisterButton->setEnabled(true);
+        break;
+
+    case uncopener::RegistrationStatus::RegisteredToOtherBinary:
+    {
+        QString otherPath = m_registry->getRegisteredBinaryPath(schemeName);
+        m_registrationStatusLabel->setText(
+            QString("Scheme '%1' is registered to another application:\n%2")
+                .arg(schemeName, otherPath));
+        m_registrationStatusLabel->setStyleSheet("color: orange;");
+        m_registerButton->setEnabled(true);
+        m_unregisterButton->setEnabled(true);
+        break;
+    }
+    }
+}
+
+void MainWindow::onRegisterClicked()
+{
+    QString schemeName = m_schemeNameEdit->text().trimmed();
+    if (schemeName.isEmpty())
+    {
+        return;
+    }
+
+    // Check if registered to another binary
+    uncopener::RegistrationStatus status = m_registry->checkRegistration(schemeName);
+    if (status == uncopener::RegistrationStatus::RegisteredToOtherBinary)
+    {
+        QString otherPath = m_registry->getRegisteredBinaryPath(schemeName);
+        QMessageBox::StandardButton reply =
+            QMessageBox::question(this, "Overwrite Registration?",
+                                  QString("Scheme '%1' is currently registered to:\n%2\n\n"
+                                          "Do you want to overwrite this registration?")
+                                      .arg(schemeName, otherPath),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+        if (reply != QMessageBox::Yes)
+        {
+            return;
+        }
+    }
+
+    uncopener::RegistrationResult result = m_registry->registerScheme(schemeName);
+    if (result.success)
+    {
+        QMessageBox::information(this, "Registration Successful",
+                                 QString("Scheme '%1' has been registered.").arg(schemeName));
+    }
+    else
+    {
+        QMessageBox::warning(
+            this, "Registration Failed",
+            QString("Failed to register scheme '%1':\n%2").arg(schemeName, result.errorMessage));
+    }
+
+    updateRegistrationStatus();
+}
+
+void MainWindow::onUnregisterClicked()
+{
+    QString schemeName = m_schemeNameEdit->text().trimmed();
+    if (schemeName.isEmpty())
+    {
+        return;
+    }
+
+    QMessageBox::StandardButton reply =
+        QMessageBox::question(this, "Unregister Scheme?",
+                              QString("Are you sure you want to unregister scheme '%1'?\n\n"
+                                      "Links using this scheme will no longer open automatically.")
+                                  .arg(schemeName),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+    if (reply != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    uncopener::RegistrationResult result = m_registry->unregisterScheme(schemeName);
+    if (result.success)
+    {
+        QMessageBox::information(this, "Unregistration Successful",
+                                 QString("Scheme '%1' has been unregistered.").arg(schemeName));
+    }
+    else
+    {
+        QMessageBox::warning(
+            this, "Unregistration Failed",
+            QString("Failed to unregister scheme '%1':\n%2").arg(schemeName, result.errorMessage));
+    }
+
+    updateRegistrationStatus();
 }

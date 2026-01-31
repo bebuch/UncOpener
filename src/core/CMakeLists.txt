@@ -3,6 +3,9 @@ add_library(uncopener_core STATIC
     Config.hpp
     PathOpener.cpp
     PathOpener.hpp
+    SchemeRegistry.hpp
+    SchemeRegistryLinux.cpp
+    SchemeRegistryWindows.cpp
     SecurityPolicy.cpp
     SecurityPolicy.hpp
     UrlParser.cpp
