@@ -68,18 +68,18 @@
 
 ### Step 5 — Security policy: UNC allow-list + filetype allow/deny lists
 
-* [ ] Implement case-insensitive UNC allow-list matching:
+* [x] Implement case-insensitive UNC allow-list matching:
 
   * Convert scheme URL → UNC (as above)
   * `startsWith` any allow-list entry (no wildcards)
   * Allow-list entries auto-normalize to backslashes; reject entries containing `/`.
-* [ ] Implement filetype policy:
+* [x] Implement filetype policy:
 
   * Mode: whitelist or blacklist, mutually exclusive.
-  * Case-insensitive “ends-with string” comparison on the *final open target* string.
+  * Case-insensitive "ends-with string" comparison on the *final open target* string.
   * Reject list entries containing `/` or `\`.
   * Default: whitelist selected but empty; switching mode disabled if the active list is non-empty.
-* [ ] Unit tests for allow-list and filetype rules.
+* [x] Unit tests for allow-list and filetype rules.
 
 ### Step 6 — Config: schema, location, persistence
 

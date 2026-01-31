@@ -19,5 +19,11 @@ int main(int argc, char* argv[])
         status |= runUrlContractTests(argc, argv);
     }
 
+    // Run security policy tests
+    {
+        extern int runSecurityPolicyTests(int argc, char* argv[]);
+        status |= runSecurityPolicyTests(argc, argv);
+    }
+
     return status;
 }
