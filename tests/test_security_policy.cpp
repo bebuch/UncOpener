@@ -14,10 +14,10 @@ private slots:
 
     void testUncAllowListEmpty()
     {
+        // Empty allow-list allows all UNC paths
         UncAllowList list;
         auto result = list.check(R"(\\server\share\path)");
-        QVERIFY(!result.allowed);
-        QVERIFY(!result.reason.isEmpty());
+        QVERIFY(result.allowed);
     }
 
     void testUncAllowListBasicMatch()

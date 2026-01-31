@@ -65,11 +65,10 @@ QStringList UncAllowList::setEntries(const QStringList& entries)
 
 PolicyCheckResult UncAllowList::check(const QString& uncPath) const
 {
+    // If the allow-list is empty, allow all UNC paths
     if (m_entries.isEmpty())
     {
-        return PolicyCheckResult::deny(
-            "No allowed UNC paths configured",
-            "Add at least one UNC path prefix to the allow-list in settings.");
+        return PolicyCheckResult::allow();
     }
 
     // Normalize the path for comparison

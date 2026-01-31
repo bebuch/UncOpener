@@ -26,10 +26,8 @@ private slots:
     void onAddUncEntry();
     void onRemoveUncEntry();
     void onFiletypeModeChanged(int index);
-    void onAddWhitelistEntry();
-    void onRemoveWhitelistEntry();
-    void onAddBlacklistEntry();
-    void onRemoveBlacklistEntry();
+    void onAddFiletypeEntry();
+    void onRemoveFiletypeEntry();
     void onSmbUsernameChanged(const QString& text);
     void onRegisterClicked();
     void onUnregisterClicked();
@@ -41,6 +39,7 @@ private:
     void updateConfigFromUi();
     void validateAndUpdateStatus();
     void updateRegistrationStatus();
+    void updateFiletypeListFromMode();
     void setModified(bool modified);
 
     uncopener::Config m_config;
@@ -54,16 +53,13 @@ private:
     QPushButton* m_addUncButton = nullptr;
     QPushButton* m_removeUncButton = nullptr;
 
+    // Unified filetype policy widgets
     QComboBox* m_filetypeModeCombo = nullptr;
-    QListWidget* m_whitelistWidget = nullptr;
-    QLineEdit* m_whitelistEntryEdit = nullptr;
-    QPushButton* m_addWhitelistButton = nullptr;
-    QPushButton* m_removeWhitelistButton = nullptr;
-
-    QListWidget* m_blacklistWidget = nullptr;
-    QLineEdit* m_blacklistEntryEdit = nullptr;
-    QPushButton* m_addBlacklistButton = nullptr;
-    QPushButton* m_removeBlacklistButton = nullptr;
+    QLabel* m_filetypeListLabel = nullptr;
+    QListWidget* m_filetypeListWidget = nullptr;
+    QLineEdit* m_filetypeEntryEdit = nullptr;
+    QPushButton* m_addFiletypeButton = nullptr;
+    QPushButton* m_removeFiletypeButton = nullptr;
 
     QLineEdit* m_smbUsernameEdit = nullptr;
     QLabel* m_configPathLabel = nullptr;
