@@ -3,6 +3,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 add_executable(uncopener_tests
     test_main.cpp
     test_placeholder.cpp
+    test_url_contract.cpp
 )
 
 target_link_libraries(uncopener_tests PRIVATE

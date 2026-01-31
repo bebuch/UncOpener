@@ -36,21 +36,21 @@
 * [x] Add `CTest` integration and make `ctest` work from presets.
 * [x] Add a "run all checks" script (`tools/`) for local use (format-check + tidy + build + tests).
 
-### Step 3 — Define the “URL contract” and test vectors (backend-owned spec)
+### Step 3 — Define the "URL contract" and test vectors (backend-owned spec)
 
-* [ ] Create a `docs/url-contract.md` capturing the rules derived from the extension:
+* [x] Create a `docs/url-contract.md` capturing the rules derived from the extension:
 
   * Extension produces: `scheme://server/share/path...` (no `scheme:server/...`).
   * No percent-encoding performed by extension; backend must decode if present.
   * Preserve trailing slash.
   * Collapse repeated slashes, remove `.` segments, reject `..` segments always.
   * Reject non-UNC inputs; accept authority edge cases; restriction via UNC allow-list.
-* [ ] Add unit tests with comprehensive vectors:
+* [x] Add unit tests with comprehensive vectors:
 
   * Valid examples (including spaces and `#` in path segments).
   * Invalid examples (`..`, missing `//`, missing authority, non-UNC structure).
   * Trailing slash preservation cases.
-* [ ] Decide and document **query/fragment behavior** (ignore vs append) and test it.
+* [x] Decide and document **query/fragment behavior** (ignore vs append) and test it.
 
 ### Step 4 — Core library: parsing + normalization + validation
 

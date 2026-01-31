@@ -13,5 +13,11 @@ int main(int argc, char* argv[])
         status |= runPlaceholderTests(argc, argv);
     }
 
+    // Run URL contract tests
+    {
+        extern int runUrlContractTests(int argc, char* argv[]);
+        status |= runUrlContractTests(argc, argv);
+    }
+
     return status;
 }

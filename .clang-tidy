@@ -32,6 +32,7 @@ Checks: >
   -readability-identifier-naming,
   -readability-implicit-bool-conversion,
   -readability-magic-numbers,
+  -readability-redundant-access-specifiers,
   -readability-redundant-inline-specifier,
   -readability-static-accessed-through-instance,
 
