@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build Linux AppImage
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            clang \
+            qt6-base-dev \
+            qt6-svg-dev \
+            libgl1-mesa-dev \
+            libxkbcommon-dev \
+            libfuse2 \
+            wget \
+            file
+
+      - name: Configure (Release)
+        run: cmake --preset rel
+
+      - name: Build
+        run: cmake --build --preset rel -j$(nproc)
+
+      - name: Run tests
+        run: ctest --preset rel --output-on-failure
+
+      - name: Create AppImage
+        run: ./packaging/package-linux.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage
+          path: dist/*.AppImage
+
+  build-windows:
+    name: Build Windows ZIP
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.6.*'
+          modules: 'qtsvg'
+
+      - name: Configure (Release)
+        run: cmake -B build/rel -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build/rel --config Release --parallel
+
+      - name: Run tests
+        run: ctest --test-dir build/rel --build-config Release --output-on-failure
+
+      - name: Package
+        shell: pwsh
+        run: |
+          # Set Qt6_DIR for windeployqt
+          $env:Qt6_DIR = "$env:Qt6_Dir"
+          # Run packaging script
+          .\packaging\package-windows.ps1 -BuildDir "build\rel" -OutputDir "dist"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip
+          path: dist/*.zip
+
+  release:
+    name: Create Release
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-appimage
+          path: artifacts/
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-zip
+          path: artifacts/
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: UncOpener v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            artifacts/*.AppImage
+            artifacts/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -190,19 +190,19 @@
 
 ### Step 14 — CI (added late, as requested)
 
-* [ ] GitHub Actions workflows:
+* [x] GitHub Actions workflows:
 
   * PR: build + unit tests on Windows + Linux
   * Run `clang-format` check
   * Run `clang-tidy`
   * Run coverage (at least Linux; publish report artifact)
   * Enforce warnings-as-errors
-* [ ] Tag/release workflow:
+* [x] Tag/release workflow:
 
   * Build Windows ZIP artifact
   * Build Linux AppImage artifact
   * Upload artifacts to GitHub Release
-* [ ] Keep scheme registration tests mocked in CI (no real registry/xdg changes on runners).
+* [x] Keep scheme registration tests mocked in CI (no real registry/xdg changes on runners).
 
 ### Step 15 — Upload to GitHub repo `bebuch/UncOpener`
 
