@@ -177,16 +177,16 @@
 
 ### Step 13 — Packaging: Windows ZIP + Linux AppImage
 
-* [ ] Windows:
+* [x] Windows:
 
   * Produce a ZIP containing the executable and required Qt runtime files.
-  * Document how scheme registration works for a “portable” ZIP install (still per-user).
-* [ ] Linux:
+  * Document how scheme registration works for a "portable" ZIP install (still per-user).
+* [x] Linux:
 
   * Provide AppImage build scripts.
   * Use Docker-based build targeting an older baseline for wider compatibility (as you noted).
   * Ensure Qt plugins are bundled correctly.
-* [ ] Add release artifact naming conventions and reproducible build notes.
+* [x] Add release artifact naming conventions and reproducible build notes.
 
 ### Step 14 — CI (added late, as requested)
 
