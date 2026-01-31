@@ -109,16 +109,16 @@
 
 ### Step 8 — Qt GUI: configuration editor (no scheme registration yet)
 
-* [ ] GUI layout includes:
+* [x] GUI layout includes:
 
   * Scheme name
   * UNC allow-list editor
   * Filetype mode selector + list editors + switching constraints
   * Linux-only SMB username field
   * Current config path display (recommended)
-* [ ] Validation in GUI with immediate feedback (forbidden characters in lists).
-* [ ] Save/apply semantics: explicit “Save” (recommended) or auto-save, but document behavior.
-* [ ] Add GUI-level tests if feasible; otherwise keep logic in core and unit-tested there.
+* [x] Validation in GUI with immediate feedback (forbidden characters in lists).
+* [x] Save/apply semantics: explicit "Save" (recommended) or auto-save, but document behavior.
+* [x] Add GUI-level tests if feasible; otherwise keep logic in core and unit-tested there.
 
 ### Step 9 — Handler mode UX: strict error dialogs + success flash
 
