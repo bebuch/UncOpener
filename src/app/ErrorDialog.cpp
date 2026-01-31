@@ -1,6 +1,7 @@
 #include "ErrorDialog.hpp"
 
 #include <QDialogButtonBox>
+#include <QIcon>
 #include <QLabel>
 #include <QStyle>
 #include <QVBoxLayout>
@@ -10,6 +11,7 @@ ErrorDialog::ErrorDialog(const QString& inputUrl, const QString& reason, const Q
     : QDialog(parent)
 {
     setWindowTitle("UncOpener - Error");
+    setWindowIcon(QIcon(":/icons/icon.svg"));
     setMinimumWidth(450);
     setModal(true);
 
