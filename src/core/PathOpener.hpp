@@ -17,19 +17,19 @@ struct OpenResult
     QString errorReason;
     QString errorRemediation;
 
-    static OpenResult ok() { return {true, {}, {}}; }
+    [[nodiscard]] static OpenResult ok() { return {true, {}, {}}; }
 
-    static OpenResult error(const QString& reason, const QString& remediation)
+    [[nodiscard]] static OpenResult error(const QString& reason, const QString& remediation)
     {
         return {false, reason, remediation};
     }
 
-    static OpenResult fromParseError(const ParseError& error)
+    [[nodiscard]] static OpenResult fromParseError(const ParseError& error)
     {
         return {false, error.reason, error.remediation};
     }
 
-    static OpenResult fromPolicyResult(const PolicyCheckResult& result)
+    [[nodiscard]] static OpenResult fromPolicyResult(const PolicyCheckResult& result)
     {
         return {false, result.reason, result.remediation};
     }
@@ -43,26 +43,26 @@ public:
 
     /// Parse and validate a URL, then open it
     /// Returns the result of the operation
-    OpenResult open(const QString& url);
+    [[nodiscard]] OpenResult open(const QString& url);
 
     /// Parse and validate a URL without opening
     /// Returns the result (success if valid and allowed)
-    OpenResult validate(const QString& url) const;
+    [[nodiscard]] OpenResult validate(const QString& url) const;
 
     /// Get the target URL/path that would be opened for a given input URL
     /// Returns empty string if validation fails
-    QString getTargetPath(const QString& url) const;
+    [[nodiscard]] QString getTargetPath(const QString& url) const;
 
     /// Get the last parsed UNC path (for display purposes)
     /// Only valid after a successful validate() or open() call
-    const UncPath& lastParsedPath() const { return m_lastPath; }
+    [[nodiscard]] const UncPath& lastParsedPath() const { return m_lastPath; }
 
 private:
     /// Build the platform-specific target URL/path from a UncPath
-    QString buildTargetUrl(const UncPath& path) const;
+    [[nodiscard]] QString buildTargetUrl(const UncPath& path) const;
 
     /// Actually open the target URL using the system
-    static bool openUrl(const QString& url);
+    [[nodiscard]] static bool openUrl(const QString& url);
 
     Config m_config;
     SecurityPolicy m_policy;

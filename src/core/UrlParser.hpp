@@ -18,10 +18,10 @@ struct UncPath
     bool hasTrailingSlash = false;
 
     /// Returns the full UNC path string (e.g., "\\server\share\path")
-    QString toUncString() const;
+    [[nodiscard]] QString toUncString() const;
 
     /// Returns the SMB URL for Linux (e.g., "smb://server/share/path")
-    QString toSmbUrl(const QString& username = {}) const;
+    [[nodiscard]] QString toSmbUrl(const QString& username = {}) const;
 };
 
 /// Error information for failed URL parsing
@@ -46,7 +46,7 @@ struct ParseError
     QString input;       // The original input that failed
 
     /// Creates a ParseError with localized messages
-    static ParseError create(Code code, const QString& input);
+    [[nodiscard]] static ParseError create(Code code, const QString& input);
 };
 
 /// Result type for URL parsing: either a UncPath or a ParseError
@@ -59,39 +59,39 @@ public:
     explicit UrlParser(QString schemeName);
 
     /// Parse a URL string and return either a UncPath or ParseError
-    ParseResult parse(const QString& input) const;
+    [[nodiscard]] ParseResult parse(const QString& input) const;
 
     /// Get the expected scheme name
-    QString schemeName() const { return m_schemeName; }
+    [[nodiscard]] QString schemeName() const { return m_schemeName; }
 
 private:
     QString m_schemeName;
 
     /// Percent-decode a string
-    static QString percentDecode(const QString& input);
+    [[nodiscard]] static QString percentDecode(const QString& input);
 
     /// Normalize path: collapse slashes, remove dot segments
     /// Returns nullopt if directory traversal (..) is detected
-    static std::optional<QString> normalizePath(const QString& path, bool& hasTrailingSlash);
+    [[nodiscard]] static std::optional<QString> normalizePath(const QString& path, bool& hasTrailingSlash);
 };
 
 /// Helper functions for working with ParseResult
-inline bool isSuccess(const ParseResult& result)
+[[nodiscard]] inline bool isSuccess(const ParseResult& result)
 {
     return std::holds_alternative<UncPath>(result);
 }
 
-inline bool isError(const ParseResult& result)
+[[nodiscard]] inline bool isError(const ParseResult& result)
 {
     return std::holds_alternative<ParseError>(result);
 }
 
-inline const UncPath& getPath(const ParseResult& result)
+[[nodiscard]] inline const UncPath& getPath(const ParseResult& result)
 {
     return std::get<UncPath>(result);
 }
 
-inline const ParseError& getError(const ParseResult& result)
+[[nodiscard]] inline const ParseError& getError(const ParseResult& result)
 {
     return std::get<ParseError>(result);
 }
