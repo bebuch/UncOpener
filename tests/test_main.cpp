@@ -1,0 +1,17 @@
+#include <QTest>
+
+// Test classes are registered via QTEST_APPLESS_MAIN in individual test files
+// This main simply provides QTest infrastructure
+
+int main(int argc, char* argv[])
+{
+    int status = 0;
+
+    // Run placeholder tests
+    {
+        extern int runPlaceholderTests(int argc, char* argv[]);
+        status |= runPlaceholderTests(argc, argv);
+    }
+
+    return status;
+}

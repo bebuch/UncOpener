@@ -18,14 +18,14 @@
 
 ### Step 1 — Repository skeleton and build presets
 
-* [ ] Create a modern CMake project skeleton (`C++17`, Qt-based app target + core library target).
-* [ ] Add `CMakePresets.json` for:
+* [x] Create a modern CMake project skeleton (`C++17`, Qt-based app target + core library target).
+* [x] Add `CMakePresets.json` for:
 
   * `dev` (Debug), `rel` (Release)
   * clang toolchain usage by default (platform-specific clang is fine).
-* [ ] Enable strict warnings and **warnings-as-errors** for all targets (compiler- and platform-appropriate).
-* [ ] Add a minimal “hello Qt” app window (no functionality yet) to validate Qt + toolchain wiring.
-* [ ] Add a minimal unit test executable (even if only a placeholder test).
+* [x] Enable strict warnings and **warnings-as-errors** for all targets (compiler- and platform-appropriate).
+* [x] Add a minimal "hello Qt" app window (no functionality yet) to validate Qt + toolchain wiring.
+* [x] Add a minimal unit test executable (even if only a placeholder test).
 
 ### Step 2 — Code hygiene tooling (must be in place early)
 
