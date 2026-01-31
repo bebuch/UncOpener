@@ -167,7 +167,8 @@ private slots:
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
-        opener.validate("unc://server/share/path/file.txt");
+        auto result = opener.validate("unc://server/share/path/file.txt");
+        QVERIFY(result.success);
 
         const UncPath& path = opener.lastParsedPath();
         QCOMPARE(path.server, "server");

@@ -3,13 +3,14 @@
 
 #include <QString>
 
+#include <cstdint>
 #include <memory>
 
 namespace uncopener
 {
 
 /// Status of scheme registration
-enum class RegistrationStatus
+enum class RegistrationStatus : std::uint8_t
 {
     /// Scheme is not registered
     NotRegistered,
@@ -37,7 +38,12 @@ struct RegistrationResult
 class SchemeRegistry
 {
 public:
+    SchemeRegistry() = default;
     virtual ~SchemeRegistry() = default;
+    SchemeRegistry(const SchemeRegistry&) = delete;
+    SchemeRegistry& operator=(const SchemeRegistry&) = delete;
+    SchemeRegistry(SchemeRegistry&&) = delete;
+    SchemeRegistry& operator=(SchemeRegistry&&) = delete;
 
     /// Check if the scheme is registered and to which binary
     [[nodiscard]] virtual RegistrationStatus checkRegistration(const QString& schemeName) const = 0;
