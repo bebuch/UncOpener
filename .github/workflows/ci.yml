@@ -52,13 +52,9 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          # Run clang-tidy on source files
-          find src -name '*.cpp' | head -20 | xargs clang-tidy -p build/dev 2>&1 | tee clang-tidy-output.txt
-          # Check for errors (warnings are allowed due to Qt ownership patterns)
-          if grep -q "error:" clang-tidy-output.txt; then
-            echo "clang-tidy found errors"
-            exit 1
-          fi
+          # Run clang-tidy on all source files
+          # WarningsAsErrors is set in .clang-tidy, so any warning will cause failure
+          find src -name '*.cpp' | xargs clang-tidy -p build/dev
 
   build-linux-release:
     name: Build (Linux Release)
