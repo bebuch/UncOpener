@@ -1,4 +1,6 @@
 add_library(uncopener_core STATIC
+    SecurityPolicy.cpp
+    SecurityPolicy.hpp
     UrlParser.cpp
     UrlParser.hpp
 )
