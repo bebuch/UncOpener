@@ -75,10 +75,10 @@ public:
 
     /// Save config to file
     /// Returns true if saved successfully
-    bool save() const;
+    [[nodiscard]] bool save() const;
 
     /// Save config to a specific file path
-    bool saveTo(const QString& filePath) const;
+    [[nodiscard]] bool saveTo(const QString& filePath) const;
 
 private:
     QString m_schemeName = DEFAULT_SCHEME_NAME;

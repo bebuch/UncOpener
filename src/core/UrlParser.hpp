@@ -3,6 +3,7 @@
 
 #include <QString>
 
+#include <cstdint>
 #include <optional>
 #include <variant>
 
@@ -27,7 +28,7 @@ struct UncPath
 /// Error information for failed URL parsing
 struct ParseError
 {
-    enum class Code
+    enum class Code : std::uint8_t
     {
         EmptyInput,
         MissingScheme,
@@ -40,7 +41,7 @@ struct ParseError
         InvalidCharacter,
     };
 
-    Code code;
+    Code code{};
     QString reason;      // Human-readable error description
     QString remediation; // Suggestion for fixing the error
     QString input;       // The original input that failed
