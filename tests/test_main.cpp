@@ -25,5 +25,11 @@ int main(int argc, char* argv[])
         status |= runSecurityPolicyTests(argc, argv);
     }
 
+    // Run config tests
+    {
+        extern int runConfigTests(int argc, char* argv[]);
+        status |= runConfigTests(argc, argv);
+    }
+
     return status;
 }

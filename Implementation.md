@@ -83,18 +83,18 @@
 
 ### Step 6 — Config: schema, location, persistence
 
-* [ ] Define config keys (format chosen by implementer, but keys stable):
+* [x] Define config keys (format chosen by implementer, but keys stable):
 
   * `schemeName`
   * `uncAllowList[]`
   * Linux-only: `smbUsername` (optional, global)
   * filetype policy: `mode` + `whitelist[]` + `blacklist[]`
-* [ ] Implement per-user config location:
+* [x] Implement per-user config location:
 
   * Windows: `%APPDATA%/UncOpener/…`
   * Linux: `$XDG_CONFIG_HOME/uncopener/…` fallback `~/.config/…`
-* [ ] Implement atomic save + safe load (defaults if missing).
-* [ ] Unit tests around config parsing/validation of lists (forbidden `/` and `\` entries, etc.).
+* [x] Implement atomic save + safe load (defaults if missing).
+* [x] Unit tests around config parsing/validation of lists (forbidden `/` and `\` entries, etc.).
 
 ### Step 7 — Platform open-target mapping
 
