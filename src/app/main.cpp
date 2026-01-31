@@ -2,16 +2,32 @@
 #include "ErrorDialog.hpp"
 #include "MainWindow.hpp"
 #include "PathOpener.hpp"
-#include "SuccessSplash.hpp"
 
 #include <QApplication>
+#include <QIcon>
+#include <QSystemTrayIcon>
 
 namespace
 {
 
+/// Show a desktop notification
+void showNotification(const QString& title, const QString& message,
+                      QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information)
+{
+    // QSystemTrayIcon requires an icon to show notifications
+    QSystemTrayIcon trayIcon;
+    trayIcon.setIcon(QIcon(":/icons/icon.svg"));
+    trayIcon.show();
+    trayIcon.showMessage(title, message, icon, 3000);
+    // Process events to ensure the notification is shown
+    QApplication::processEvents();
+}
+
 /// Handle URL opening mode (when called with a URL argument)
 int runHandlerMode(QApplication& app, const QString& url)
 {
+    Q_UNUSED(app)
+
     // Load configuration
     uncopener::Config config;
     config.load();
@@ -28,12 +44,10 @@ int runHandlerMode(QApplication& app, const QString& url)
         return 1;
     }
 
-    // Success: show splash for 1 second
-    SuccessSplash splash;
-    QObject::connect(&splash, &SuccessSplash::finished, &app, &QApplication::quit);
-    splash.showFor(1000);
-
-    return app.exec();
+    // Success: show notification and exit
+    const uncopener::UncPath& path = opener.lastParsedPath();
+    showNotification("UncOpener", "Opening: " + path.toUncString());
+    return 0;
 }
 
 /// Run the configuration GUI mode
@@ -52,6 +66,9 @@ int main(int argc, char* argv[])
     app.setApplicationName("UncOpener");
     app.setApplicationVersion("0.1.0");
     app.setOrganizationName("bebuch");
+
+    // Set application-wide icon (applies to all windows and dialogs)
+    app.setWindowIcon(QIcon(":/icons/icon.svg"));
 
     QStringList args = app.arguments();
 
