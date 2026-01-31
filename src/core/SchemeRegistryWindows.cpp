@@ -23,7 +23,7 @@ QString registryPath(const QString& schemeName)
 class WindowsSchemeRegistry : public SchemeRegistry
 {
 public:
-    RegistrationStatus checkRegistration(const QString& schemeName) const override
+    [[nodiscard]] RegistrationStatus checkRegistration(const QString& schemeName) const override
     {
         QString registeredPath = getRegisteredBinaryPath(schemeName);
 
@@ -42,7 +42,7 @@ public:
         return RegistrationStatus::RegisteredToOtherBinary;
     }
 
-    QString getRegisteredBinaryPath(const QString& schemeName) const override
+    [[nodiscard]] QString getRegisteredBinaryPath(const QString& schemeName) const override
     {
         QSettings registry(registryPath(schemeName) + "\\shell\\open\\command",
                            QSettings::NativeFormat);
@@ -74,7 +74,7 @@ public:
         return command;
     }
 
-    RegistrationResult registerScheme(const QString& schemeName) override
+    [[nodiscard]] RegistrationResult registerScheme(const QString& schemeName) override
     {
         QString basePath = registryPath(schemeName);
         QString binaryPath = currentBinaryPath();
@@ -103,7 +103,7 @@ public:
         return RegistrationResult::ok();
     }
 
-    RegistrationResult unregisterScheme(const QString& schemeName) override
+    [[nodiscard]] RegistrationResult unregisterScheme(const QString& schemeName) override
     {
         QString basePath = registryPath(schemeName);
 
