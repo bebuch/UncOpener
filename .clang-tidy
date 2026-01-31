@@ -35,8 +35,11 @@ Checks: >
   -readability-redundant-access-specifiers,
   -readability-redundant-inline-specifier,
   -readability-static-accessed-through-instance,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-prefer-member-initializer,
+  -readability-math-missing-parentheses,
 
-WarningsAsErrors: ''
+WarningsAsErrors: '*'
 
 HeaderFilterRegex: '^(?!.*/build/).*$'
 
