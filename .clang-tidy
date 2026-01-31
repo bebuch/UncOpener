@@ -41,7 +41,7 @@ Checks: >
 
 WarningsAsErrors: '*'
 
-HeaderFilterRegex: '^(?!.*/build/).*$'
+HeaderFilterRegex: '.*/src/.*\.hpp$'
 
 CheckOptions:
   - key: modernize-loop-convert.MinConfidence
