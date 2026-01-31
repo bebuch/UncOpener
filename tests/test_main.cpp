@@ -31,5 +31,11 @@ int main(int argc, char* argv[])
         status |= runConfigTests(argc, argv);
     }
 
+    // Run path opener tests
+    {
+        extern int runPathOpenerTests(int argc, char* argv[]);
+        status |= runPathOpenerTests(argc, argv);
+    }
+
     return status;
 }

@@ -98,14 +98,14 @@
 
 ### Step 7 — Platform open-target mapping
 
-* [ ] Windows: after validation, convert to final UNC path string and open via `QDesktopServices::openUrl(...)`.
-* [ ] Linux: build SMB URL:
+* [x] Windows: after validation, convert to final UNC path string and open via `QDesktopServices::openUrl(...)`.
+* [x] Linux: build SMB URL:
 
   * `smb://[username@]server/share/path`
   * Encode username (`DOMAIN\user` via standard URL encoding).
   * Preserve trailing slash.
-* [ ] Ensure the allow-list check always happens against the UNC form (as specified), then open the OS-specific target.
-* [ ] Unit tests for SMB URL generation and trailing slash behavior.
+* [x] Ensure the allow-list check always happens against the UNC form (as specified), then open the OS-specific target.
+* [x] Unit tests for SMB URL generation and trailing slash behavior.
 
 ### Step 8 — Qt GUI: configuration editor (no scheme registration yet)
 
