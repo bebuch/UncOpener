@@ -24,34 +24,34 @@ public:
     Config() = default;
 
     /// Get/set the custom URL scheme name
-    QString schemeName() const { return m_schemeName; }
+    [[nodiscard]] QString schemeName() const { return m_schemeName; }
     void setSchemeName(const QString& name) { m_schemeName = name; }
 
     /// Get/set the UNC allow-list
-    QStringList uncAllowList() const { return m_uncAllowList; }
+    [[nodiscard]] QStringList uncAllowList() const { return m_uncAllowList; }
     void setUncAllowList(const QStringList& list) { m_uncAllowList = list; }
 
     /// Get/set the SMB username (Linux only)
-    QString smbUsername() const { return m_smbUsername; }
+    [[nodiscard]] QString smbUsername() const { return m_smbUsername; }
     void setSmbUsername(const QString& username) { m_smbUsername = username; }
 
     /// Get/set the filetype policy mode
-    FiletypeMode filetypeMode() const { return m_filetypeMode; }
+    [[nodiscard]] FiletypeMode filetypeMode() const { return m_filetypeMode; }
     void setFiletypeMode(FiletypeMode mode) { m_filetypeMode = mode; }
 
     /// Get/set the filetype whitelist
-    QStringList filetypeWhitelist() const { return m_filetypeWhitelist; }
+    [[nodiscard]] QStringList filetypeWhitelist() const { return m_filetypeWhitelist; }
     void setFiletypeWhitelist(const QStringList& list) { m_filetypeWhitelist = list; }
 
     /// Get/set the filetype blacklist
-    QStringList filetypeBlacklist() const { return m_filetypeBlacklist; }
+    [[nodiscard]] QStringList filetypeBlacklist() const { return m_filetypeBlacklist; }
     void setFiletypeBlacklist(const QStringList& list) { m_filetypeBlacklist = list; }
 
     /// Apply this config to a SecurityPolicy
     void applyTo(SecurityPolicy& policy) const;
 
     /// Serialize to JSON
-    QJsonObject toJson() const;
+    [[nodiscard]] QJsonObject toJson() const;
 
     /// Deserialize from JSON
     /// Returns true if successful, false if invalid JSON
@@ -61,10 +61,10 @@ public:
     void reset();
 
     /// Get the default configuration directory path
-    static QString configDirPath();
+    [[nodiscard]] static QString configDirPath();
 
     /// Get the default configuration file path
-    static QString configFilePath();
+    [[nodiscard]] static QString configFilePath();
 
     /// Load config from file
     /// Returns true if loaded successfully, false if file doesn't exist or is invalid
