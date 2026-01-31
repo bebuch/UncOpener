@@ -162,18 +162,18 @@
 
 ### Step 12 — Icons pipeline: SVG → platform assets, committed outputs
 
-* [ ] Add `icon.svg` to repo root (or `assets/`).
-* [ ] Add scripts to generate:
+* [x] Add `icon.svg` to repo root (or `assets/`).
+* [x] Add scripts to generate:
 
   * Windows icon assets (ICO) and app icons
   * Linux icons (PNG sizes as needed for AppImage/desktop)
   * In-app icon usage; use SVG directly where possible.
-* [ ] For PNG optimization:
+* [x] For PNG optimization:
 
   * script calls optimizer `--help` first (for traceability)
   * run optimizer with maximal settings
-* [ ] Generated assets are committed to git and used by build/install packaging.
-* [ ] Add a `tools/generate-icons` script and document usage in `docs/`.
+* [x] Generated assets are committed to git and used by build/install packaging.
+* [x] Add a `tools/generate-icons` script and document usage in `docs/`.
 
 ### Step 13 — Packaging: Windows ZIP + Linux AppImage
 

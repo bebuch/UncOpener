@@ -43,8 +43,8 @@ CTestTestfile.cmake
 Testing/
 _deps/
 
-# Generated icon assets (keep source SVG, ignore generated)
-*.ico
+# Generated icon assets are tracked in assets/ directory
+# (see tools/generate-icons.sh)
 
 # Package/release artifacts
 *.zip
