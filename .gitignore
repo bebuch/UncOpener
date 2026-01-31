@@ -1,0 +1,64 @@
+# Build directories
+build/
+out/
+cmake-build-*/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.cproject
+.settings/
+*.user
+*.creator.user
+
+# Compiled objects and binaries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Qt generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*.qm
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+_deps/
+
+# Generated icon assets (keep source SVG, ignore generated)
+*.ico
+
+# Package/release artifacts
+*.zip
+*.AppImage
+*.deb
+*.rpm
+
+# Coverage reports
+coverage/
+*.gcno
+*.gcda
+*.gcov
+lcov.info
+
+# OS files
+.DS_Store
+Thumbs.db

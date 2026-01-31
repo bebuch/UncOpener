@@ -12,9 +12,9 @@
 
 ### Step 0 — Basic setup
 
-* [ ] Create a .gitginore
-* [ ] Create a Readme.md with the project description
-* [ ] Add MIT License
+* [x] Create a .gitginore
+* [x] Create a Readme.md with the project description
+* [x] Add MIT License
 
 ### Step 1 — Repository skeleton and build presets
 
