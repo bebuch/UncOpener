@@ -1,5 +1,6 @@
 add_library(uncopener_core STATIC
-    placeholder.cpp
+    UrlParser.cpp
+    UrlParser.hpp
 )
 
 target_include_directories(uncopener_core PUBLIC

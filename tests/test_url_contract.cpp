@@ -1,10 +1,12 @@
-#include <QTest>
+#include "UrlParser.hpp"
+
 #include <QString>
+#include <QTest>
 #include <QVector>
 
+using namespace uncopener;
+
 // Test vectors based on docs/url-contract.md
-// These tests define the expected behavior for URL parsing and validation.
-// The actual implementation will be added in Step 4.
 
 struct ValidUrlTestCase
 {
@@ -16,7 +18,8 @@ struct ValidUrlTestCase
 struct InvalidUrlTestCase
 {
     QString input;
-    QString expectedReason;
+    ParseError::Code expectedCode;
+    QString description;
 };
 
 class UrlContractTest : public QObject
@@ -49,66 +52,211 @@ private:
     static QVector<InvalidUrlTestCase> invalidUrls()
     {
         return {
-            {"//server/share", "Missing scheme"},
-            {"unc:/server/share", "Single slash (invalid format)"},
-            {"unc:///share", "Missing authority"},
-            {"unc://server", "Missing share"},
-            {"unc://server/share/../other", "Directory traversal"},
-            {"unc://server/share/path/../../other", "Directory traversal (multiple)"},
-            {"http://server/share", "Wrong scheme"},
-            {"", "Empty input"},
-            {"unc://", "Missing authority and path"},
-            {"unc:// /share", "Whitespace authority"},
+            {"//server/share", ParseError::Code::MissingScheme, "Missing scheme"},
+            {"unc:/server/share", ParseError::Code::InvalidSchemeFormat,
+             "Single slash (invalid format)"},
+            {"unc:///share", ParseError::Code::MissingAuthority, "Missing authority"},
+            {"unc://server", ParseError::Code::MissingShare, "Missing share"},
+            {"unc://server/share/../other", ParseError::Code::DirectoryTraversal,
+             "Directory traversal"},
+            {"unc://server/share/path/../../other", ParseError::Code::DirectoryTraversal,
+             "Directory traversal (multiple)"},
+            {"http://server/share", ParseError::Code::WrongScheme, "Wrong scheme"},
+            {"", ParseError::Code::EmptyInput, "Empty input"},
+            {"unc://", ParseError::Code::MissingAuthority, "Missing authority and path"},
+            {"unc:// /share", ParseError::Code::WhitespaceAuthority, "Whitespace authority"},
         };
     }
 
 private slots:
-    void testValidUrlCount()
+    void testValidUrlParsing_data()
     {
-        // Ensure we have test vectors defined
-        QVERIFY(validUrls().size() >= 10);
-    }
+        QTest::addColumn<QString>("input");
+        QTest::addColumn<QString>("expectedUncPath");
 
-    void testInvalidUrlCount()
-    {
-        // Ensure we have test vectors defined
-        QVERIFY(invalidUrls().size() >= 8);
-    }
-
-    void testValidUrlVectorsDocumented()
-    {
-        // This test verifies that all valid test vectors have descriptions
         for (const auto& testCase : validUrls())
         {
-            QVERIFY2(!testCase.description.isEmpty(),
-                     qPrintable(QString("Test case '%1' has no description").arg(testCase.input)));
+            QTest::newRow(qPrintable(testCase.description))
+                << testCase.input << testCase.expectedUncPath;
         }
     }
 
-    void testInvalidUrlVectorsDocumented()
+    void testValidUrlParsing()
     {
-        // This test verifies that all invalid test vectors have reasons
+        QFETCH(QString, input);
+        QFETCH(QString, expectedUncPath);
+
+        UrlParser parser("unc");
+        ParseResult result = parser.parse(input);
+
+        QVERIFY2(isSuccess(result),
+                 qPrintable(QString("Expected success for '%1', got error: %2")
+                                .arg(input, isError(result) ? getError(result).reason : "")));
+
+        const UncPath& path = getPath(result);
+        QCOMPARE(path.toUncString(), expectedUncPath);
+    }
+
+    void testInvalidUrlRejection_data()
+    {
+        QTest::addColumn<QString>("input");
+        QTest::addColumn<int>("expectedCode");
+
         for (const auto& testCase : invalidUrls())
         {
-            QVERIFY2(!testCase.expectedReason.isEmpty(),
-                     qPrintable(QString("Test case '%1' has no reason").arg(testCase.input)));
+            QTest::newRow(qPrintable(testCase.description))
+                << testCase.input << static_cast<int>(testCase.expectedCode);
         }
     }
 
-    // The following tests will be implemented in Step 4 when the parsing logic is added:
-    //
-    // void testValidUrlParsing_data();
-    // void testValidUrlParsing();
-    // void testInvalidUrlRejection_data();
-    // void testInvalidUrlRejection();
-    // void testPercentDecoding_data();
-    // void testPercentDecoding();
-    // void testDotSegmentRemoval_data();
-    // void testDotSegmentRemoval();
-    // void testSlashCollapsing_data();
-    // void testSlashCollapsing();
-    // void testTrailingSlashPreservation_data();
-    // void testTrailingSlashPreservation();
+    void testInvalidUrlRejection()
+    {
+        QFETCH(QString, input);
+        QFETCH(int, expectedCode);
+
+        UrlParser parser("unc");
+        ParseResult result = parser.parse(input);
+
+        QVERIFY2(isError(result),
+                 qPrintable(QString("Expected error for '%1', got success").arg(input)));
+
+        const ParseError& error = getError(result);
+        QCOMPARE(static_cast<int>(error.code), expectedCode);
+    }
+
+    void testTrailingSlashPreservation()
+    {
+        UrlParser parser("unc");
+
+        // Without trailing slash
+        {
+            ParseResult result = parser.parse("unc://server/share/path");
+            QVERIFY(isSuccess(result));
+            QVERIFY(!getPath(result).hasTrailingSlash);
+            QVERIFY(!getPath(result).toUncString().endsWith('\\'));
+        }
+
+        // With trailing slash
+        {
+            ParseResult result = parser.parse("unc://server/share/path/");
+            QVERIFY(isSuccess(result));
+            QVERIFY(getPath(result).hasTrailingSlash);
+            QVERIFY(getPath(result).toUncString().endsWith('\\'));
+        }
+    }
+
+    void testSmbUrlGeneration()
+    {
+        UrlParser parser("unc");
+
+        // Basic SMB URL
+        {
+            ParseResult result = parser.parse("unc://server/share/path");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).toSmbUrl(), "smb://server/share/path");
+        }
+
+        // SMB URL with username
+        {
+            ParseResult result = parser.parse("unc://server/share/path");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).toSmbUrl("myuser"), "smb://myuser@server/share/path");
+        }
+
+        // SMB URL with domain username
+        {
+            ParseResult result = parser.parse("unc://server/share/path");
+            QVERIFY(isSuccess(result));
+            QString smbUrl = getPath(result).toSmbUrl(R"(DOMAIN\user)");
+            QVERIFY(smbUrl.contains("DOMAIN%5Cuser@"));
+        }
+
+        // SMB URL with trailing slash
+        {
+            ParseResult result = parser.parse("unc://server/share/path/");
+            QVERIFY(isSuccess(result));
+            QVERIFY(getPath(result).toSmbUrl().endsWith('/'));
+        }
+    }
+
+    void testDifferentScheme()
+    {
+        // Using a different scheme name
+        UrlParser parser("myscheme");
+
+        // Should succeed with matching scheme
+        {
+            ParseResult result = parser.parse("myscheme://server/share");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).server, "server");
+        }
+
+        // Should fail with different scheme
+        {
+            ParseResult result = parser.parse("unc://server/share");
+            QVERIFY(isError(result));
+            QCOMPARE(getError(result).code, ParseError::Code::WrongScheme);
+        }
+    }
+
+    void testPercentDecoding()
+    {
+        UrlParser parser("unc");
+
+        // Percent-encoded space
+        {
+            ParseResult result = parser.parse("unc://server/share/my%20file.txt");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).path, "my file.txt");
+        }
+
+        // Percent-encoded special characters
+        {
+            ParseResult result = parser.parse("unc://server/share/file%23name");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).path, "file#name");
+        }
+
+        // Mixed percent-encoded and literal
+        {
+            ParseResult result = parser.parse("unc://server/share/path%20with spaces");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).path, "path with spaces");
+        }
+    }
+
+    void testSlashCollapsing()
+    {
+        UrlParser parser("unc");
+
+        // Double slashes in path
+        {
+            ParseResult result = parser.parse("unc://server/share//path//file");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).toUncString(), R"(\\server\share\path\file)");
+        }
+
+        // Multiple consecutive slashes
+        {
+            ParseResult result = parser.parse("unc://server/share///path");
+            QVERIFY(isSuccess(result));
+            QCOMPARE(getPath(result).toUncString(), R"(\\server\share\path)");
+        }
+    }
+
+    void testErrorMessages()
+    {
+        UrlParser parser("unc");
+
+        // Verify error messages are populated
+        ParseResult result = parser.parse("");
+        QVERIFY(isError(result));
+
+        const ParseError& error = getError(result);
+        QVERIFY(!error.reason.isEmpty());
+        QVERIFY(!error.remediation.isEmpty());
+        QCOMPARE(error.input, "");
+    }
 };
 
 int runUrlContractTests(int argc, char* argv[])
