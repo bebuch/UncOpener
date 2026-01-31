@@ -1,4 +1,4 @@
-find_package(Qt6 REQUIRED COMPONENTS Test Svg)
+find_package(Qt6 REQUIRED COMPONENTS Test Svg Widgets)
 
 add_executable(uncopener_tests
     test_config.cpp
@@ -39,5 +39,32 @@ set_project_warnings(uncopener_resource_tests)
 
 add_test(NAME uncopener_resource_tests COMMAND uncopener_resource_tests)
 set_tests_properties(uncopener_resource_tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+)
+
+# Test for dialog window icons
+add_executable(uncopener_dialog_tests
+    test_dialogs.cpp
+    ../src/app/ErrorDialog.cpp
+    ../src/app/ErrorDialog.hpp
+    ../src/app/resources.qrc
+)
+
+target_include_directories(uncopener_dialog_tests PRIVATE
+    ../src/app
+)
+
+target_link_libraries(uncopener_dialog_tests PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Svg
+    Qt6::Widgets
+    Qt6::Test
+)
+
+set_project_warnings(uncopener_dialog_tests)
+
+add_test(NAME uncopener_dialog_tests COMMAND uncopener_dialog_tests)
+set_tests_properties(uncopener_dialog_tests PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
