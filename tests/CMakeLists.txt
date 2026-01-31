@@ -18,6 +18,9 @@ target_link_libraries(uncopener_tests PRIVATE
 set_project_warnings(uncopener_tests)
 
 add_test(NAME uncopener_tests COMMAND uncopener_tests)
+set_tests_properties(uncopener_tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+)
 
 # Separate test for resources (needs Qt6::Svg and the resources.qrc)
 add_executable(uncopener_resource_tests
@@ -35,3 +38,6 @@ target_link_libraries(uncopener_resource_tests PRIVATE
 set_project_warnings(uncopener_resource_tests)
 
 add_test(NAME uncopener_resource_tests COMMAND uncopener_resource_tests)
+set_tests_properties(uncopener_resource_tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+)
