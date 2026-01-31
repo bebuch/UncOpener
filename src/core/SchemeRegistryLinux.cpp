@@ -77,7 +77,7 @@ QString extractBinaryFromExecLine(const QString& execLine)
 class LinuxSchemeRegistry : public SchemeRegistry
 {
 public:
-    RegistrationStatus checkRegistration(const QString& schemeName) const override
+    [[nodiscard]] RegistrationStatus checkRegistration(const QString& schemeName) const override
     {
         QString registeredPath = getRegisteredBinaryPath(schemeName);
 
@@ -96,7 +96,7 @@ public:
         return RegistrationStatus::RegisteredToOtherBinary;
     }
 
-    QString getRegisteredBinaryPath(const QString& schemeName) const override
+    [[nodiscard]] QString getRegisteredBinaryPath(const QString& schemeName) const override
     {
         QString desktopPath = desktopFilePath(schemeName);
         QFile file(desktopPath);
@@ -120,7 +120,7 @@ public:
         return {};
     }
 
-    RegistrationResult registerScheme(const QString& schemeName) override
+    [[nodiscard]] RegistrationResult registerScheme(const QString& schemeName) override
     {
         QString desktopPath = desktopFilePath(schemeName);
         QString binaryPath = currentBinaryPath();
@@ -178,7 +178,7 @@ public:
         return RegistrationResult::ok();
     }
 
-    RegistrationResult unregisterScheme(const QString& schemeName) override
+    [[nodiscard]] RegistrationResult unregisterScheme(const QString& schemeName) override
     {
         QString desktopPath = desktopFilePath(schemeName);
 
