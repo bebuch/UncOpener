@@ -77,6 +77,10 @@ Configuration is stored per-user:
 - Windows: `%APPDATA%/UncOpener/`
 - Linux: `$XDG_CONFIG_HOME/uncopener/` or `~/.config/uncopener/`
 
+## Related Projects
+
+- **[UncClickable](https://github.com/bebuch/UncClickable)** - Browser extension that converts UNC paths in web pages to clickable links using the custom URL scheme handled by this application. Supports Firefox, Chrome, and Edge.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
