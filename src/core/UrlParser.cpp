@@ -35,7 +35,10 @@ QString UncPath::toSmbUrl(const QString& username) const
     result += server + "/" + share;
     if (!path.isEmpty())
     {
-        result += "/" + path;
+        // Convert backslashes to forward slashes for SMB URLs
+        QString smbPath = path;
+        smbPath.replace('\\', '/');
+        result += "/" + smbPath;
     }
     if (hasTrailingSlash && !result.endsWith('/'))
     {

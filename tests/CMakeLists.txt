@@ -3,6 +3,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 add_executable(uncopener_tests
     test_config.cpp
     test_main.cpp
+    test_path_opener.cpp
     test_placeholder.cpp
     test_security_policy.cpp
     test_url_contract.cpp
