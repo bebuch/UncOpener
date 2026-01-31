@@ -2,8 +2,7 @@
 
 #include <QLabel>
 
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
     setWindowTitle("UncOpener");
     setMinimumSize(400, 300);

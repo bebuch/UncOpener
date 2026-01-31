@@ -29,12 +29,12 @@
 
 ### Step 2 — Code hygiene tooling (must be in place early)
 
-* [ ] Add `.clang-format` and enforce formatting via a CMake target (e.g., `format` / `format-check`).
-* [ ] Add `.clang-tidy` and integrate clang-tidy into CMake (toggleable via preset option, but enabled for dev/CI).
-* [ ] Add basic `.editorconfig`.
-* [ ] Add `cmake-format`/`cmakelint` only if desired (optional), but at least ensure CMake style is consistent.
-* [ ] Add `CTest` integration and make `ctest` work from presets.
-* [ ] Add a “run all checks” script (`tools/`) for local use (format-check + tidy + build + tests).
+* [x] Add `.clang-format` and enforce formatting via a CMake target (e.g., `format` / `format-check`).
+* [x] Add `.clang-tidy` and integrate clang-tidy into CMake (toggleable via preset option, but enabled for dev/CI).
+* [x] Add basic `.editorconfig`.
+* [x] Add `cmake-format`/`cmakelint` only if desired (optional), but at least ensure CMake style is consistent.
+* [x] Add `CTest` integration and make `ctest` work from presets.
+* [x] Add a "run all checks" script (`tools/`) for local use (format-check + tidy + build + tests).
 
 ### Step 3 — Define the “URL contract” and test vectors (backend-owned spec)
 
