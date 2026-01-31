@@ -11,7 +11,7 @@ scheme://server/share/path/to/resource
 ```
 
 Where:
-- `scheme` is the custom scheme name configured by the user (e.g., `unc`)
+- `scheme` is the custom scheme name configured by the user (default: `uncopener`)
 - `server` is the network server name (the URL authority/host)
 - `share` is the share name on the server
 - `path/to/resource` is the optional path within the share
@@ -45,7 +45,7 @@ UncOpener applies the following normalization to all input URLs:
 
 ### 3. Trailing Slash Preservation
 - A trailing slash in the input URL is preserved in the final output
-- `unc://server/share/folder/` opens differently than `unc://server/share/folder`
+- `uncopener://server/share/folder/` opens differently than `uncopener://server/share/folder`
 
 ## Validation Rules
 
@@ -62,17 +62,17 @@ A URL is **invalid** if any of the following conditions apply:
 |-----------|---------|--------|
 | Missing scheme | `//server/share` | No scheme identifier |
 | Wrong scheme | `http://server/share` | Scheme mismatch |
-| Missing authority | `unc:///share/path` | Empty server name |
-| Single slash | `unc:/server/share` | Invalid URL format |
-| Directory traversal | `unc://server/share/../other` | Security risk |
-| Empty path | `unc://server` | No share specified |
+| Missing authority | `uncopener:///share/path` | Empty server name |
+| Single slash | `uncopener:/server/share` | Invalid URL format |
+| Directory traversal | `uncopener://server/share/../other` | Security risk |
+| Empty path | `uncopener://server` | No share specified |
 
 ## Query and Fragment Handling
 
 Query strings (`?...`) and fragments (`#...`) in URLs are **ignored**:
 
-- `unc://server/share/file?query=value` opens `\\server\share\file`
-- `unc://server/share/file#anchor` opens `\\server\share\file`
+- `uncopener://server/share/file?query=value` opens `\\server\share\file`
+- `uncopener://server/share/file#anchor` opens `\\server\share\file`
 
 This behavior is chosen because:
 1. UNC paths do not support query strings or fragments
@@ -101,7 +101,7 @@ Allow-list entries:
 After validation, the URL is converted to a standard UNC path:
 
 ```
-unc://server/share/path/to/file.txt
+uncopener://server/share/path/to/file.txt
   -> \\server\share\path\to\file.txt
 ```
 
@@ -112,7 +112,7 @@ The path is opened using `QDesktopServices::openUrl()`.
 The URL is converted to an SMB URL:
 
 ```
-unc://server/share/path/to/file.txt
+uncopener://server/share/path/to/file.txt
   -> smb://server/share/path/to/file.txt
 ```
 
@@ -136,23 +136,23 @@ With domain-qualified username:
 
 | Input | Windows Output | Notes |
 |-------|----------------|-------|
-| `unc://server/share` | `\\server\share` | Minimal valid path |
-| `unc://server/share/` | `\\server\share\` | Trailing slash preserved |
-| `unc://server/share/path` | `\\server\share\path` | Path component |
-| `unc://server/share/path/file.txt` | `\\server\share\path\file.txt` | Full path |
-| `unc://server/share/path%20name` | `\\server\share\path name` | Percent-encoded space |
-| `unc://server/share/path name` | `\\server\share\path name` | Literal space |
-| `unc://server/share/file%23name` | `\\server\share\file#name` | Percent-encoded # |
-| `unc://server/share/./file` | `\\server\share\file` | Dot segment removed |
-| `unc://server/share//path` | `\\server\share\path` | Double slash collapsed |
+| `uncopener://server/share` | `\\server\share` | Minimal valid path |
+| `uncopener://server/share/` | `\\server\share\` | Trailing slash preserved |
+| `uncopener://server/share/path` | `\\server\share\path` | Path component |
+| `uncopener://server/share/path/file.txt` | `\\server\share\path\file.txt` | Full path |
+| `uncopener://server/share/path%20name` | `\\server\share\path name` | Percent-encoded space |
+| `uncopener://server/share/path name` | `\\server\share\path name` | Literal space |
+| `uncopener://server/share/file%23name` | `\\server\share\file#name` | Percent-encoded # |
+| `uncopener://server/share/./file` | `\\server\share\file` | Dot segment removed |
+| `uncopener://server/share//path` | `\\server\share\path` | Double slash collapsed |
 
 ### Invalid URLs
 
 | Input | Rejection Reason |
 |-------|------------------|
 | `//server/share` | Missing scheme |
-| `unc:/server/share` | Single slash (invalid format) |
-| `unc:///share` | Missing authority |
-| `unc://server` | Missing share |
-| `unc://server/share/../other` | Directory traversal |
+| `uncopener:/server/share` | Single slash (invalid format) |
+| `uncopener:///share` | Missing authority |
+| `uncopener://server` | Missing share |
+| `uncopener://server/share/../other` | Directory traversal |
 | `http://server/share` | Wrong scheme |

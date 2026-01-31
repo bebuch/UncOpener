@@ -16,7 +16,7 @@ class Config
 {
 public:
     /// Default scheme name
-    static constexpr const char* DEFAULT_SCHEME_NAME = "unc";
+    static constexpr const char* DEFAULT_SCHEME_NAME = "uncopener";
 
     /// Default filetype mode
     static constexpr FiletypeMode DEFAULT_FILETYPE_MODE = FiletypeMode::Whitelist;

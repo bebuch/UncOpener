@@ -5,6 +5,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QMessageBox>
 #include <QVBoxLayout>
 
@@ -12,7 +13,8 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), m_registry(uncopener::SchemeRegistry::create())
 {
     setWindowTitle("UncOpener - Configuration");
-    setMinimumSize(600, 800);
+    setWindowIcon(QIcon(":/icon.svg"));
+    setMinimumSize(600, 700);
 
     setupUi();
     loadConfig();
@@ -27,7 +29,7 @@ void MainWindow::setupUi()
     auto* schemeGroup = new QGroupBox("URL Scheme", centralWidget);
     auto* schemeLayout = new QFormLayout(schemeGroup);
     m_schemeNameEdit = new QLineEdit(schemeGroup);
-    m_schemeNameEdit->setPlaceholderText("unc");
+    m_schemeNameEdit->setPlaceholderText("uncopener");
     schemeLayout->addRow("Scheme name:", m_schemeNameEdit);
     connect(m_schemeNameEdit, &QLineEdit::textChanged, this, &MainWindow::onSchemeNameChanged);
     mainLayout->addWidget(schemeGroup);
@@ -35,6 +37,10 @@ void MainWindow::setupUi()
     // UNC Allow-list section
     auto* uncGroup = new QGroupBox("UNC Allow-List", centralWidget);
     auto* uncLayout = new QVBoxLayout(uncGroup);
+
+    auto* uncHintLabel = new QLabel("If empty, all UNC paths are allowed.", uncGroup);
+    uncHintLabel->setStyleSheet("color: gray; font-style: italic;");
+    uncLayout->addWidget(uncHintLabel);
 
     m_uncAllowList = new QListWidget(uncGroup);
     uncLayout->addWidget(m_uncAllowList);
@@ -56,7 +62,7 @@ void MainWindow::setupUi()
 
     mainLayout->addWidget(uncGroup);
 
-    // Filetype policy section
+    // Filetype policy section - single unified list
     auto* filetypeGroup = new QGroupBox("Filetype Policy", centralWidget);
     auto* filetypeLayout = new QVBoxLayout(filetypeGroup);
 
@@ -71,53 +77,27 @@ void MainWindow::setupUi()
     connect(m_filetypeModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &MainWindow::onFiletypeModeChanged);
 
-    // Whitelist
-    auto* whitelistLayout = new QVBoxLayout();
-    whitelistLayout->addWidget(new QLabel("Whitelist (allowed extensions):"));
-    m_whitelistWidget = new QListWidget(filetypeGroup);
-    m_whitelistWidget->setMaximumHeight(100);
-    whitelistLayout->addWidget(m_whitelistWidget);
+    // Single list for either whitelist or blacklist
+    m_filetypeListLabel = new QLabel(filetypeGroup);
+    filetypeLayout->addWidget(m_filetypeListLabel);
 
-    auto* whitelistEntryLayout = new QHBoxLayout();
-    m_whitelistEntryEdit = new QLineEdit(filetypeGroup);
-    m_whitelistEntryEdit->setPlaceholderText(".txt, .pdf, .doc");
-    whitelistEntryLayout->addWidget(m_whitelistEntryEdit);
-    m_addWhitelistButton = new QPushButton("Add", filetypeGroup);
-    m_removeWhitelistButton = new QPushButton("Remove", filetypeGroup);
-    whitelistEntryLayout->addWidget(m_addWhitelistButton);
-    whitelistEntryLayout->addWidget(m_removeWhitelistButton);
-    whitelistLayout->addLayout(whitelistEntryLayout);
-    filetypeLayout->addLayout(whitelistLayout);
+    m_filetypeListWidget = new QListWidget(filetypeGroup);
+    m_filetypeListWidget->setMaximumHeight(120);
+    filetypeLayout->addWidget(m_filetypeListWidget);
 
-    connect(m_addWhitelistButton, &QPushButton::clicked, this, &MainWindow::onAddWhitelistEntry);
-    connect(m_removeWhitelistButton, &QPushButton::clicked, this,
-            &MainWindow::onRemoveWhitelistEntry);
-    connect(m_whitelistEntryEdit, &QLineEdit::returnPressed, this,
-            &MainWindow::onAddWhitelistEntry);
+    auto* filetypeEntryLayout = new QHBoxLayout();
+    m_filetypeEntryEdit = new QLineEdit(filetypeGroup);
+    filetypeEntryLayout->addWidget(m_filetypeEntryEdit);
+    m_addFiletypeButton = new QPushButton("Add", filetypeGroup);
+    m_removeFiletypeButton = new QPushButton("Remove", filetypeGroup);
+    filetypeEntryLayout->addWidget(m_addFiletypeButton);
+    filetypeEntryLayout->addWidget(m_removeFiletypeButton);
+    filetypeLayout->addLayout(filetypeEntryLayout);
 
-    // Blacklist
-    auto* blacklistLayout = new QVBoxLayout();
-    blacklistLayout->addWidget(new QLabel("Blacklist (blocked extensions):"));
-    m_blacklistWidget = new QListWidget(filetypeGroup);
-    m_blacklistWidget->setMaximumHeight(100);
-    blacklistLayout->addWidget(m_blacklistWidget);
-
-    auto* blacklistEntryLayout = new QHBoxLayout();
-    m_blacklistEntryEdit = new QLineEdit(filetypeGroup);
-    m_blacklistEntryEdit->setPlaceholderText(".exe, .bat, .cmd");
-    blacklistEntryLayout->addWidget(m_blacklistEntryEdit);
-    m_addBlacklistButton = new QPushButton("Add", filetypeGroup);
-    m_removeBlacklistButton = new QPushButton("Remove", filetypeGroup);
-    blacklistEntryLayout->addWidget(m_addBlacklistButton);
-    blacklistEntryLayout->addWidget(m_removeBlacklistButton);
-    blacklistLayout->addLayout(blacklistEntryLayout);
-    filetypeLayout->addLayout(blacklistLayout);
-
-    connect(m_addBlacklistButton, &QPushButton::clicked, this, &MainWindow::onAddBlacklistEntry);
-    connect(m_removeBlacklistButton, &QPushButton::clicked, this,
-            &MainWindow::onRemoveBlacklistEntry);
-    connect(m_blacklistEntryEdit, &QLineEdit::returnPressed, this,
-            &MainWindow::onAddBlacklistEntry);
+    connect(m_addFiletypeButton, &QPushButton::clicked, this, &MainWindow::onAddFiletypeEntry);
+    connect(m_removeFiletypeButton, &QPushButton::clicked, this,
+            &MainWindow::onRemoveFiletypeEntry);
+    connect(m_filetypeEntryEdit, &QLineEdit::returnPressed, this, &MainWindow::onAddFiletypeEntry);
 
     mainLayout->addWidget(filetypeGroup);
 
@@ -134,11 +114,14 @@ void MainWindow::setupUi()
 
     // Config path display
     auto* pathGroup = new QGroupBox("Configuration", centralWidget);
-    auto* pathLayout = new QFormLayout(pathGroup);
+    auto* pathLayout = new QVBoxLayout(pathGroup);
+    auto* pathFormLayout = new QFormLayout();
     m_configPathLabel = new QLabel(uncopener::Config::configFilePath(), pathGroup);
     m_configPathLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_configPathLabel->setWordWrap(true);
-    pathLayout->addRow("Config file:", m_configPathLabel);
+    m_configPathLabel->setMinimumWidth(400);
+    pathFormLayout->addRow("Config file:", m_configPathLabel);
+    pathLayout->addLayout(pathFormLayout);
     mainLayout->addWidget(pathGroup);
 
     // Scheme registration section
@@ -193,11 +176,7 @@ void MainWindow::updateUiFromConfig()
     m_filetypeModeCombo->setCurrentIndex(
         m_config.filetypeMode() == uncopener::FiletypeMode::Whitelist ? 0 : 1);
 
-    m_whitelistWidget->clear();
-    m_whitelistWidget->addItems(m_config.filetypeWhitelist());
-
-    m_blacklistWidget->clear();
-    m_blacklistWidget->addItems(m_config.filetypeBlacklist());
+    updateFiletypeListFromMode();
 
 #ifndef Q_OS_WIN
     if (m_smbUsernameEdit != nullptr)
@@ -208,6 +187,29 @@ void MainWindow::updateUiFromConfig()
 
     validateAndUpdateStatus();
     updateRegistrationStatus();
+}
+
+void MainWindow::updateFiletypeListFromMode()
+{
+    m_filetypeListWidget->clear();
+
+    bool isWhitelist = m_filetypeModeCombo->currentIndex() == 0;
+    if (isWhitelist)
+    {
+        m_filetypeListLabel->setText("Allowed extensions (if empty, all types are allowed):");
+        m_filetypeEntryEdit->setPlaceholderText(".txt, .pdf, .doc");
+        m_filetypeListWidget->addItems(m_config.filetypeWhitelist());
+    }
+    else
+    {
+        m_filetypeListLabel->setText("Blocked extensions:");
+        m_filetypeEntryEdit->setPlaceholderText(".exe, .bat, .cmd");
+        m_filetypeListWidget->addItems(m_config.filetypeBlacklist());
+    }
+
+    // Disable mode switching if the current list has entries
+    bool hasEntries = m_filetypeListWidget->count() > 0;
+    m_filetypeModeCombo->setEnabled(!hasEntries);
 }
 
 void MainWindow::updateConfigFromUi()
@@ -225,19 +227,21 @@ void MainWindow::updateConfigFromUi()
                                  ? uncopener::FiletypeMode::Whitelist
                                  : uncopener::FiletypeMode::Blacklist);
 
-    QStringList whitelist;
-    for (int i = 0; i < m_whitelistWidget->count(); ++i)
+    // Update the appropriate list based on mode
+    QStringList filetypeList;
+    for (int i = 0; i < m_filetypeListWidget->count(); ++i)
     {
-        whitelist.append(m_whitelistWidget->item(i)->text());
+        filetypeList.append(m_filetypeListWidget->item(i)->text());
     }
-    m_config.setFiletypeWhitelist(whitelist);
 
-    QStringList blacklist;
-    for (int i = 0; i < m_blacklistWidget->count(); ++i)
+    if (m_filetypeModeCombo->currentIndex() == 0)
     {
-        blacklist.append(m_blacklistWidget->item(i)->text());
+        m_config.setFiletypeWhitelist(filetypeList);
     }
-    m_config.setFiletypeBlacklist(blacklist);
+    else
+    {
+        m_config.setFiletypeBlacklist(filetypeList);
+    }
 
 #ifndef Q_OS_WIN
     if (m_smbUsernameEdit != nullptr)
@@ -255,11 +259,6 @@ void MainWindow::validateAndUpdateStatus()
     if (m_schemeNameEdit->text().trimmed().isEmpty())
     {
         status = "Warning: Scheme name is empty";
-        hasWarnings = true;
-    }
-    else if (m_uncAllowList->count() == 0)
-    {
-        status = "Warning: UNC allow-list is empty - no paths will be allowed";
         hasWarnings = true;
     }
 
@@ -350,13 +349,17 @@ void MainWindow::onRemoveUncEntry()
 
 void MainWindow::onFiletypeModeChanged(int /*index*/)
 {
+    // Save current list to config before switching
+    updateConfigFromUi();
+    // Update the list display for the new mode
+    updateFiletypeListFromMode();
     setModified(true);
     validateAndUpdateStatus();
 }
 
-void MainWindow::onAddWhitelistEntry()
+void MainWindow::onAddFiletypeEntry()
 {
-    QString entry = m_whitelistEntryEdit->text().trimmed();
+    QString entry = m_filetypeEntryEdit->text().trimmed();
     if (entry.isEmpty())
     {
         return;
@@ -370,49 +373,26 @@ void MainWindow::onAddWhitelistEntry()
     }
 
     entry = uncopener::FiletypePolicy::normalizeExtension(entry);
-    m_whitelistWidget->addItem(entry);
-    m_whitelistEntryEdit->clear();
+    m_filetypeListWidget->addItem(entry);
+    m_filetypeEntryEdit->clear();
     setModified(true);
+
+    // Update config and refresh mode combo state
+    updateConfigFromUi();
+    m_filetypeModeCombo->setEnabled(m_filetypeListWidget->count() == 0);
 }
 
-void MainWindow::onRemoveWhitelistEntry()
+void MainWindow::onRemoveFiletypeEntry()
 {
-    auto* item = m_whitelistWidget->currentItem();
+    auto* item = m_filetypeListWidget->currentItem();
     if (item != nullptr)
     {
-        delete m_whitelistWidget->takeItem(m_whitelistWidget->row(item));
+        delete m_filetypeListWidget->takeItem(m_filetypeListWidget->row(item));
         setModified(true);
-    }
-}
 
-void MainWindow::onAddBlacklistEntry()
-{
-    QString entry = m_blacklistEntryEdit->text().trimmed();
-    if (entry.isEmpty())
-    {
-        return;
-    }
-
-    if (!uncopener::FiletypePolicy::isValidExtension(entry))
-    {
-        QMessageBox::warning(this, "Invalid Extension",
-                             "Extensions cannot contain path separators (/ or \\).");
-        return;
-    }
-
-    entry = uncopener::FiletypePolicy::normalizeExtension(entry);
-    m_blacklistWidget->addItem(entry);
-    m_blacklistEntryEdit->clear();
-    setModified(true);
-}
-
-void MainWindow::onRemoveBlacklistEntry()
-{
-    auto* item = m_blacklistWidget->currentItem();
-    if (item != nullptr)
-    {
-        delete m_blacklistWidget->takeItem(m_blacklistWidget->row(item));
-        setModified(true);
+        // Update config and refresh mode combo state
+        updateConfigFromUi();
+        m_filetypeModeCombo->setEnabled(m_filetypeListWidget->count() == 0);
     }
 }
 
