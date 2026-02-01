@@ -14,8 +14,8 @@ UncOpener-<version>-<platform>.<ext>
 ```
 
 Examples:
-- `UncOpener-0.1.0-windows.zip`
-- `UncOpener-0.1.0-x86_64.AppImage`
+- `UncOpener-1.0-windows.zip`
+- `UncOpener-1.0-x86_64.AppImage`
 
 ## Windows Packaging
 
@@ -90,10 +90,10 @@ The script creates:
 ### AppImage Usage
 ```bash
 # Make executable
-chmod +x UncOpener-0.1.0-x86_64.AppImage
+chmod +x UncOpener-1.0-x86_64.AppImage
 
 # Run
-./UncOpener-0.1.0-x86_64.AppImage
+./UncOpener-1.0-x86_64.AppImage
 ```
 
 ## Reproducible Builds

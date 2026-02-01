@@ -13,7 +13,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-VERSION="0.1.0"
+VERSION="1.0"
 APP_NAME="UncOpener"
 BUILD_DIR="${PROJECT_ROOT}/build/rel"
 OUTPUT_DIR="${PROJECT_ROOT}/dist"
@@ -40,8 +40,12 @@ echo "Found executable: ${EXECUTABLE}"
 # Create output directory
 mkdir -p "${OUTPUT_DIR}"
 
+# Create tools directory for linuxdeploy (separate from output to avoid uploading tools as artifacts)
+TOOLS_DIR="${PROJECT_ROOT}/build/tools"
+mkdir -p "${TOOLS_DIR}"
+
 # Download linuxdeploy if not present
-LINUXDEPLOY="${OUTPUT_DIR}/linuxdeploy-x86_64.AppImage"
+LINUXDEPLOY="${TOOLS_DIR}/linuxdeploy-x86_64.AppImage"
 if [ ! -f "$LINUXDEPLOY" ]; then
     echo ""
     echo "Downloading linuxdeploy..."
@@ -51,7 +55,7 @@ if [ ! -f "$LINUXDEPLOY" ]; then
 fi
 
 # Download linuxdeploy Qt plugin if not present
-LINUXDEPLOY_QT="${OUTPUT_DIR}/linuxdeploy-plugin-qt-x86_64.AppImage"
+LINUXDEPLOY_QT="${TOOLS_DIR}/linuxdeploy-plugin-qt-x86_64.AppImage"
 if [ ! -f "$LINUXDEPLOY_QT" ]; then
     echo ""
     echo "Downloading linuxdeploy Qt plugin..."
