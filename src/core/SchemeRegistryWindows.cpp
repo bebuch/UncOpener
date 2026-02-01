@@ -1,3 +1,4 @@
+#include <QtGlobal>
 #ifdef Q_OS_WIN
 
 #include "SchemeRegistry.hpp"
@@ -14,7 +15,7 @@ namespace
 /// Registry path for HKCU scheme registration
 QString registryPath(const QString& schemeName)
 {
-    return "HKEY_CURRENT_USER\\Software\\Classes\\" + schemeName;
+    return R"(HKEY_CURRENT_USER\Software\Classes\)" + schemeName;
 }
 
 } // namespace
@@ -44,7 +45,7 @@ public:
 
     [[nodiscard]] QString getRegisteredBinaryPath(const QString& schemeName) const override
     {
-        QSettings registry(registryPath(schemeName) + "\\shell\\open\\command",
+        QSettings registry(registryPath(schemeName) + R"(\shell\open\command)",
                            QSettings::NativeFormat);
 
         QString command = registry.value("Default").toString();
@@ -85,8 +86,8 @@ public:
         baseKey.setValue("URL Protocol", "");
 
         // Create the command key
-        QSettings commandKey(basePath + "\\shell\\open\\command", QSettings::NativeFormat);
-        QString command = "\"" + binaryPath + "\" \"%1\"";
+        QSettings commandKey(basePath + R"(\shell\open\command)", QSettings::NativeFormat);
+        QString command = "\"" + binaryPath + R"(" "%1")";
         commandKey.setValue("Default", command);
 
         // Create the icon key

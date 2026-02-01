@@ -37,5 +37,11 @@ int main(int argc, char* argv[])
         status |= runPathOpenerTests(argc, argv);
     }
 
+    // Run scheme registry tests
+    {
+        extern int runSchemeRegistryTests(int argc, char* argv[]);
+        status |= runSchemeRegistryTests(argc, argv);
+    }
+
     return status;
 }
