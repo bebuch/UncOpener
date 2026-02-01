@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationName("UncOpener");
-    app.setApplicationVersion("0.1.0");
+    app.setApplicationVersion("1.0");
     app.setOrganizationName("bebuch");
 
     // Set application-wide icon (applies to all windows and dialogs)

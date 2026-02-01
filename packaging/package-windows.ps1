@@ -16,7 +16,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
-$Version = "0.1.0"
+$Version = "1.0"
 $AppName = "UncOpener"
 
 Write-Host "=== $AppName Windows Packaging ===" -ForegroundColor Cyan
