@@ -47,6 +47,7 @@ _deps/
 # (see tools/generate-icons.sh)
 
 # Package/release artifacts
+dist/
 *.zip
 *.AppImage
 *.deb
