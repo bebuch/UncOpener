@@ -83,11 +83,14 @@ Categories=Utility;Network;
 MimeType=x-scheme-handler/unc;
 EOF
 
-# Copy icon
-ICON_SRC="${PROJECT_ROOT}/assets/linux/icon-256.png"
-if [ ! -f "$ICON_SRC" ]; then
-    echo "WARNING: Icon not found at ${ICON_SRC}"
-    ICON_SRC="${PROJECT_ROOT}/icon.svg"
+# Copy icon (rename to match Icon= entry in desktop file)
+ICON_ORIG="${PROJECT_ROOT}/assets/linux/icon-256.png"
+ICON_SRC="${OUTPUT_DIR}/uncopener.png"
+if [ -f "$ICON_ORIG" ]; then
+    cp "$ICON_ORIG" "$ICON_SRC"
+else
+    echo "WARNING: Icon not found at ${ICON_ORIG}"
+    ICON_SRC="${PROJECT_ROOT}/assets/icon.svg"
 fi
 
 # Set Qt environment if not already set
