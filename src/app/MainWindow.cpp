@@ -130,6 +130,19 @@ void MainWindow::setupUi()
     pathLayout->addLayout(pathFormLayout);
     mainLayout->addWidget(pathGroup);
 
+    // Status and save
+    auto* bottomLayout = new QHBoxLayout();
+    m_statusLabel = new QLabel(centralWidget);
+    bottomLayout->addWidget(m_statusLabel);
+    bottomLayout->addStretch();
+    m_saveButton = new QPushButton("Save", centralWidget);
+    m_saveButton->setEnabled(false);
+    connect(m_saveButton, &QPushButton::clicked, this, &MainWindow::onSaveClicked);
+    bottomLayout->addWidget(m_saveButton);
+    mainLayout->addLayout(bottomLayout);
+
+    setCentralWidget(centralWidget);
+
     // Scheme registration section
     auto* registrationGroup = new QGroupBox("Scheme Registration", centralWidget);
     auto* registrationLayout = new QVBoxLayout(registrationGroup);
@@ -150,19 +163,6 @@ void MainWindow::setupUi()
     connect(m_unregisterButton, &QPushButton::clicked, this, &MainWindow::onUnregisterClicked);
 
     mainLayout->addWidget(registrationGroup);
-
-    // Status and save
-    auto* bottomLayout = new QHBoxLayout();
-    m_statusLabel = new QLabel(centralWidget);
-    bottomLayout->addWidget(m_statusLabel);
-    bottomLayout->addStretch();
-    m_saveButton = new QPushButton("Save", centralWidget);
-    m_saveButton->setEnabled(false);
-    connect(m_saveButton, &QPushButton::clicked, this, &MainWindow::onSaveClicked);
-    bottomLayout->addWidget(m_saveButton);
-    mainLayout->addLayout(bottomLayout);
-
-    setCentralWidget(centralWidget);
 }
 
 void MainWindow::loadConfig()
