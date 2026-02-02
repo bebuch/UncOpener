@@ -13,7 +13,6 @@
             "generator": "Ninja Multi-Config",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
@@ -27,7 +26,6 @@
             "generator": "Ninja Multi-Config",
             "binaryDir": "${sourceDir}/build/coverage",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_CONFIGURATION_TYPES": "Debug",
                 "CMAKE_CXX_FLAGS_DEBUG": "--coverage",
