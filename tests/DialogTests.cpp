@@ -130,4 +130,4 @@ int runDialogsTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_dialogs.moc"
+#include "DialogTests.moc"

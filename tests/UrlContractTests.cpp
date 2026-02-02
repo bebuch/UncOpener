@@ -283,4 +283,4 @@ int runUrlContractTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_url_contract.moc"
+#include "UrlContractTests.moc"

@@ -686,4 +686,4 @@ int runMainWindowTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_mainwindow.moc"
+#include "MainWindowTests.moc"

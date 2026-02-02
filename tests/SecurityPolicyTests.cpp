@@ -239,4 +239,4 @@ int runSecurityPolicyTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_security_policy.moc"
+#include "SecurityPolicyTests.moc"

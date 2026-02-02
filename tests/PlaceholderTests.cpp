@@ -16,4 +16,4 @@ int runPlaceholderTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_placeholder.moc"
+#include "PlaceholderTests.moc"

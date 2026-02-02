@@ -118,4 +118,4 @@ int runSchemeRegistryTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_scheme_registry.moc"
+#include "SchemeRegistryTests.moc"

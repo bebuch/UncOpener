@@ -195,4 +195,4 @@ int runPathOpenerTests(int argc, char* argv[])
     return QTest::qExec(&test, argc, argv);
 }
 
-#include "test_path_opener.moc"
+#include "PathOpenerTests.moc"

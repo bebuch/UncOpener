@@ -1,13 +1,13 @@
 find_package(Qt6 REQUIRED COMPONENTS Test Svg Widgets)
 
 add_executable(uncopener_tests
-    test_config.cpp
-    test_main.cpp
-    test_path_opener.cpp
-    test_placeholder.cpp
-    test_scheme_registry.cpp
-    test_security_policy.cpp
-    test_url_contract.cpp
+    ConfigTests.cpp
+    TestMain.cpp
+    PathOpenerTests.cpp
+    PlaceholderTests.cpp
+    SchemeRegistryTests.cpp
+    SecurityPolicyTests.cpp
+    UrlContractTests.cpp
 )
 
 target_link_libraries(uncopener_tests PRIVATE
@@ -25,7 +25,7 @@ set_tests_properties(uncopener_tests PROPERTIES
 
 # Separate test for resources (needs Qt6::Svg and the resources.qrc)
 add_executable(uncopener_resource_tests
-    test_resources.cpp
+    ResourceTests.cpp
     ../src/app/resources.qrc
 )
 
@@ -47,9 +47,9 @@ set_tests_properties(uncopener_resource_tests PROPERTIES
 
 # Test for dialog and window icons and MainWindow workflows
 add_executable(uncopener_gui_tests
-    test_gui_main.cpp
-    test_dialogs.cpp
-    test_mainwindow.cpp
+    GuiTestMain.cpp
+    DialogTests.cpp
+    MainWindowTests.cpp
     ../src/app/ErrorDialog.cpp
     ../src/app/ErrorDialog.hpp
     ../src/app/MainWindow.cpp

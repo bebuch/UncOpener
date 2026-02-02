@@ -50,4 +50,4 @@ private slots:
 };
 
 QTEST_MAIN(ResourcesTest)
-#include "test_resources.moc"
+#include "ResourceTests.moc"
