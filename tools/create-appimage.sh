@@ -41,8 +41,8 @@ download_tools() {
 # Build the project in Release mode
 build_project() {
     echo "Building project in Release mode..."
-    cmake -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DUNCOPENER_ENABLE_CLANG_TIDY=OFF "$PROJECT_DIR"
-    cmake --build "$BUILD_DIR" --parallel
+    cmake --preset default
+    cmake --build --preset release
 }
 
 # Create AppImage
