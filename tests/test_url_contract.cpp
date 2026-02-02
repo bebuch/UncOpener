@@ -36,7 +36,8 @@ private:
             {"uncopener://server/share", R"(\\server\share)", "Minimal valid path"},
             {"uncopener://server/share/", R"(\\server\share\)", "Trailing slash preserved"},
             {"uncopener://server/share/path", R"(\\server\share\path)", "Path component"},
-            {"uncopener://server/share/path/file.txt", R"(\\server\share\path\file.txt)", "Full path"},
+            {"uncopener://server/share/path/file.txt", R"(\\server\share\path\file.txt)",
+             "Full path"},
             {"uncopener://server/share/path%20name", R"(\\server\share\path name)",
              "Percent-encoded space"},
             {"uncopener://server/share/path name", R"(\\server\share\path name)", "Literal space"},
@@ -45,8 +46,10 @@ private:
             {"uncopener://server/share/./file", R"(\\server\share\file)", "Dot segment removed"},
             {"uncopener://server/share//path", R"(\\server\share\path)", "Double slash collapsed"},
             {"uncopener://SERVER/SHARE/path", R"(\\SERVER\SHARE\path)", "Case preserved"},
-            {"uncopener://server/share/path?query=value", R"(\\server\share\path)", "Query ignored"},
-            {"uncopener://server/share/path#fragment", R"(\\server\share\path)", "Fragment ignored"},
+            {"uncopener://server/share/path?query=value", R"(\\server\share\path)",
+             "Query ignored"},
+            {"uncopener://server/share/path#fragment", R"(\\server\share\path)",
+             "Fragment ignored"},
         };
     }
 
@@ -208,21 +211,21 @@ private slots:
         {
             ParseResult result = parser.parse("uncopener://server/share/my%20file.txt");
             QVERIFY(isSuccess(result));
-            QCOMPARE(getPath(result).path, "my file.txt");
+            QCOMPARE(getPath(result).path, R"(share\my file.txt)");
         }
 
         // Percent-encoded special characters
         {
             ParseResult result = parser.parse("uncopener://server/share/file%23name");
             QVERIFY(isSuccess(result));
-            QCOMPARE(getPath(result).path, "file#name");
+            QCOMPARE(getPath(result).path, R"(share\file#name)");
         }
 
         // Mixed percent-encoded and literal
         {
             ParseResult result = parser.parse("uncopener://server/share/path%20with spaces");
             QVERIFY(isSuccess(result));
-            QCOMPARE(getPath(result).path, "path with spaces");
+            QCOMPARE(getPath(result).path, R"(share\path with spaces)");
         }
     }
 

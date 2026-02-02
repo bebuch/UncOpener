@@ -127,7 +127,7 @@ std::optional<QString> UrlParser::normalizePath(const QString& path, bool& hasTr
 {
     if (path.isEmpty())
     {
-        hasTrailingSlash = false;
+        // Don't modify hasTrailingSlash - caller has already determined it
         return QString();
     }
 
@@ -276,9 +276,16 @@ ParseResult UrlParser::parse(const QString& input) const
     bool hasTrailingSlash = false;
 
     // Check if there's a trailing slash
+    // Special case: if remainder ends with '/' but pathPart is empty, we still have a trailing
+    // slash (e.g., "server/" means the URL was "scheme://server/")
     if (!rawPath.isEmpty())
     {
         hasTrailingSlash = rawPath.endsWith('/') || rawPath.endsWith('\\');
+    }
+    else if (firstSlash >= 0 && remainder.endsWith('/'))
+    {
+        // URL like "scheme://server/" - path is empty but there was a trailing slash
+        hasTrailingSlash = true;
     }
 
     // Normalize the path

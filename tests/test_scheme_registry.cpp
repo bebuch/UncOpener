@@ -106,7 +106,8 @@ private slots:
         }
 
         // Should now be registered to this binary
-        QCOMPARE(registry->checkRegistration(testScheme), RegistrationStatus::RegisteredToThisBinary);
+        QCOMPARE(registry->checkRegistration(testScheme),
+                 RegistrationStatus::RegisteredToThisBinary);
 
         // Registered binary path should match current binary
         QString registeredPath = registry->getRegisteredBinaryPath(testScheme);

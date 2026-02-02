@@ -121,7 +121,6 @@ private slots:
         auto* remediationValue = dialog.findChild<QLabel*>("remediationValue");
         QVERIFY(remediationValue);
     }
-
 };
 
 QTEST_MAIN(DialogsTest)
