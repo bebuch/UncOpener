@@ -130,7 +130,10 @@ std::unique_ptr<SchemeRegistry> SchemeRegistry::create()
 
 QString SchemeRegistry::currentBinaryPath()
 {
-    return QCoreApplication::applicationFilePath();
+    // QCoreApplication::applicationFilePath() returns forward slashes on all platforms.
+    // Windows ShellExecute requires backslashes in registry command paths,
+    // otherwise "Access is denied" errors occur when activating the URL protocol.
+    return QCoreApplication::applicationFilePath().replace('/', '\\');
 }
 
 } // namespace uncopener
