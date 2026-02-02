@@ -53,7 +53,7 @@ void MainWindow::setupUi()
 
     auto* uncEntryLayout = new QHBoxLayout();
     m_uncEntryEdit = new QLineEdit(uncGroup);
-    m_uncEntryEdit->setPlaceholderText(R"(\\server\share)");
+    m_uncEntryEdit->setPlaceholderText(R"(\\server\path)");
     uncEntryLayout->addWidget(m_uncEntryEdit);
 
     m_addUncButton = new QPushButton("Add", uncGroup);

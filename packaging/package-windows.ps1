@@ -194,7 +194,7 @@ The registration is per-user (HKEY_CURRENT_USER) and does not require administra
 
 ## Usage
 
-Once registered, clicking links like 'unc://server/share/path' in your browser
+Once registered, clicking links like 'uncopener://server/path/to/resource' in your browser
 will open the corresponding UNC path in Windows Explorer.
 
 ## Uninstallation

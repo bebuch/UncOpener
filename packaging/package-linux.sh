@@ -152,7 +152,7 @@ and uses xdg-mime to set the default handler.
 
 ## Usage
 
-Once registered, clicking links like 'unc://server/share/path' in your browser
+Once registered, clicking links like 'uncopener://server/path/to/resource' in your browser
 will open the corresponding SMB path in your file manager.
 
 ## System Requirements

@@ -12,11 +12,11 @@ private slots:
     void testValidateSuccess()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
-        OpenResult result = opener.validate("unc://server/share/file.txt");
+        OpenResult result = opener.validate("uncopener://server/share/file.txt");
 
         QVERIFY(result.success);
         QVERIFY(result.errorReason.isEmpty());
@@ -25,7 +25,7 @@ private slots:
     void testValidateParseError()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
@@ -38,11 +38,11 @@ private slots:
     void testValidateNotInAllowList()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\allowed\share)"});
 
         PathOpener opener(config);
-        OpenResult result = opener.validate("unc://notallowed/share/file.txt");
+        OpenResult result = opener.validate("uncopener://notallowed/share/file.txt");
 
         QVERIFY(!result.success);
         QVERIFY(result.errorReason.contains("allow"));
@@ -51,13 +51,13 @@ private slots:
     void testValidateFiletypeBlocked()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
         config.setFiletypeMode(FiletypeMode::Blacklist);
         config.setFiletypeBlacklist({".exe"});
 
         PathOpener opener(config);
-        OpenResult result = opener.validate("unc://server/share/malware.exe");
+        OpenResult result = opener.validate("uncopener://server/share/malware.exe");
 
         QVERIFY(!result.success);
         QVERIFY(result.errorReason.contains("blacklist"));
@@ -66,26 +66,26 @@ private slots:
     void testValidateFiletypeAllowed()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
         config.setFiletypeMode(FiletypeMode::Whitelist);
         config.setFiletypeWhitelist({".txt", ".pdf"});
 
         PathOpener opener(config);
 
-        QVERIFY(opener.validate("unc://server/share/doc.txt").success);
-        QVERIFY(opener.validate("unc://server/share/doc.pdf").success);
-        QVERIFY(!opener.validate("unc://server/share/doc.exe").success);
+        QVERIFY(opener.validate("uncopener://server/share/doc.txt").success);
+        QVERIFY(opener.validate("uncopener://server/share/doc.pdf").success);
+        QVERIFY(!opener.validate("uncopener://server/share/doc.exe").success);
     }
 
     void testGetTargetPathWindows()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
-        QString target = opener.getTargetPath("unc://server/share/path/file.txt");
+        QString target = opener.getTargetPath("uncopener://server/share/path/file.txt");
 
 #ifdef Q_OS_WIN
         QCOMPARE(target, R"(\\server\share\path\file.txt)");
@@ -97,12 +97,12 @@ private slots:
     void testGetTargetPathWithUsername()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
         config.setSmbUsername("testuser");
 
         PathOpener opener(config);
-        QString target = opener.getTargetPath("unc://server/share/file.txt");
+        QString target = opener.getTargetPath("uncopener://server/share/file.txt");
 
 #ifdef Q_OS_WIN
         // Windows doesn't use username in path
@@ -115,12 +115,12 @@ private slots:
     void testGetTargetPathWithDomainUsername()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
         config.setSmbUsername(R"(DOMAIN\user)");
 
         PathOpener opener(config);
-        QString target = opener.getTargetPath("unc://server/share/file.txt");
+        QString target = opener.getTargetPath("uncopener://server/share/file.txt");
 
 #ifndef Q_OS_WIN
         // Linux should percent-encode the backslash
@@ -131,13 +131,13 @@ private slots:
     void testGetTargetPathTrailingSlash()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
 
-        QString withSlash = opener.getTargetPath("unc://server/share/folder/");
-        QString withoutSlash = opener.getTargetPath("unc://server/share/folder");
+        QString withSlash = opener.getTargetPath("uncopener://server/share/folder/");
+        QString withoutSlash = opener.getTargetPath("uncopener://server/share/folder");
 
 #ifdef Q_OS_WIN
         QVERIFY(withSlash.endsWith('\\'));
@@ -151,7 +151,7 @@ private slots:
     void testGetTargetPathInvalid()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
@@ -163,11 +163,11 @@ private slots:
     void testLastParsedPath()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
-        auto result = opener.validate("unc://server/share/path/file.txt");
+        auto result = opener.validate("uncopener://server/share/path/file.txt");
         QVERIFY(result.success);
 
         const UncPath& path = opener.lastParsedPath();
@@ -178,11 +178,11 @@ private slots:
     void testDirectoryTraversalBlocked()
     {
         Config config;
-        config.setSchemeName("unc");
+        config.setSchemeName("uncopener");
         config.setUncAllowList({R"(\\server\share)"});
 
         PathOpener opener(config);
-        OpenResult result = opener.validate("unc://server/share/../other/file.txt");
+        OpenResult result = opener.validate("uncopener://server/share/../other/file.txt");
 
         QVERIFY(!result.success);
         QVERIFY(result.errorReason.contains("traversal"));
