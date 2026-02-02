@@ -61,9 +61,13 @@ jobs:
       - name: Setup C++ toolchain
         uses: aminya/setup-cpp@v1
         with:
-          compiler: llvm-19
           cmake: true
           ninja: true
+
+      - name: Install LLVM
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "19"
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
