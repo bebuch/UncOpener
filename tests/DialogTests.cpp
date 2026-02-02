@@ -92,6 +92,7 @@ private slots:
     void testMainWindowHasCorrectTitle()
     {
         MainWindow window;
+        // On startup, no unsaved changes, so no asterisk
         QCOMPARE(window.windowTitle(), QString("UncOpener - Configuration"));
     }
 
@@ -123,5 +124,10 @@ private slots:
     }
 };
 
-QTEST_MAIN(DialogsTest)
-#include "test_dialogs.moc"
+int runDialogsTests(int argc, char* argv[])
+{
+    DialogsTest test;
+    return QTest::qExec(&test, argc, argv);
+}
+
+#include "DialogTests.moc"

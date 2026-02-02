@@ -53,6 +53,9 @@ public:
     /// Serialize to JSON
     [[nodiscard]] QJsonObject toJson() const;
 
+    /// Serialize to JSON bytes (for comparison)
+    [[nodiscard]] QByteArray toJsonBytes() const;
+
     /// Deserialize from JSON
     /// Returns true if successful, false if invalid JSON
     bool fromJson(const QJsonObject& json);

@@ -74,6 +74,11 @@ QJsonObject Config::toJson() const
     return json;
 }
 
+QByteArray Config::toJsonBytes() const
+{
+    return QJsonDocument(toJson()).toJson(QJsonDocument::Compact);
+}
+
 bool Config::fromJson(const QJsonObject& json)
 {
     // Scheme name (required, with default)

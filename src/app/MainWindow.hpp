@@ -40,11 +40,11 @@ private:
     void validateAndUpdateStatus();
     void updateRegistrationStatus();
     void updateFiletypeListFromMode();
-    void setModified(bool modified);
+    [[nodiscard]] bool hasUnsavedChanges();
 
     uncopener::Config m_config;
     std::unique_ptr<uncopener::SchemeRegistry> m_registry;
-    bool m_modified = false;
+    QByteArray m_savedConfigJson;
 
     // Widgets
     QLineEdit* m_schemeNameEdit = nullptr;

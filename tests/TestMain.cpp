@@ -1,48 +1,59 @@
-#include <QCoreApplication>
+#include <QApplication>
 #include <QTest>
 
-// Test classes are registered via QTEST_APPLESS_MAIN in individual test files
-// This main simply provides QTest infrastructure
+// Unified test main - uses QApplication for GUI test support
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     int status = 0;
 
-    // Run placeholder tests
+    // Core tests
     {
         extern int runPlaceholderTests(int argc, char* argv[]);
         status |= runPlaceholderTests(argc, argv);
     }
 
-    // Run URL contract tests
     {
         extern int runUrlContractTests(int argc, char* argv[]);
         status |= runUrlContractTests(argc, argv);
     }
 
-    // Run security policy tests
     {
         extern int runSecurityPolicyTests(int argc, char* argv[]);
         status |= runSecurityPolicyTests(argc, argv);
     }
 
-    // Run config tests
     {
         extern int runConfigTests(int argc, char* argv[]);
         status |= runConfigTests(argc, argv);
     }
 
-    // Run path opener tests
     {
         extern int runPathOpenerTests(int argc, char* argv[]);
         status |= runPathOpenerTests(argc, argv);
     }
 
-    // Run scheme registry tests
     {
         extern int runSchemeRegistryTests(int argc, char* argv[]);
         status |= runSchemeRegistryTests(argc, argv);
+    }
+
+    // Resource tests
+    {
+        extern int runResourceTests(int argc, char* argv[]);
+        status |= runResourceTests(argc, argv);
+    }
+
+    // GUI tests
+    {
+        extern int runDialogsTests(int argc, char* argv[]);
+        status |= runDialogsTests(argc, argv);
+    }
+
+    {
+        extern int runMainWindowTests(int argc, char* argv[]);
+        status |= runMainWindowTests(argc, argv);
     }
 
     return status;
