@@ -172,8 +172,7 @@ private slots:
 
         const UncPath& path = opener.lastParsedPath();
         QCOMPARE(path.server, "server");
-        QCOMPARE(path.share, "share");
-        QCOMPARE(path.path, R"(path\file.txt)");
+        QCOMPARE(path.path, R"(share\path\file.txt)");
     }
 
     void testDirectoryTraversalBlocked()

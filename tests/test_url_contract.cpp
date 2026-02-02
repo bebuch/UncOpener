@@ -31,6 +31,8 @@ private:
     static QVector<ValidUrlTestCase> validUrls()
     {
         return {
+            {"unc://server", R"(\\server)", "Server only"},
+            {"unc://server/", R"(\\server\)", "Server with trailing slash"},
             {"unc://server/share", R"(\\server\share)", "Minimal valid path"},
             {"unc://server/share/", R"(\\server\share\)", "Trailing slash preserved"},
             {"unc://server/share/path", R"(\\server\share\path)", "Path component"},
@@ -56,7 +58,6 @@ private:
             {"unc:/server/share", ParseError::Code::InvalidSchemeFormat,
              "Single slash (invalid format)"},
             {"unc:///share", ParseError::Code::MissingAuthority, "Missing authority"},
-            {"unc://server", ParseError::Code::MissingShare, "Missing share"},
             {"unc://server/share/../other", ParseError::Code::DirectoryTraversal,
              "Directory traversal"},
             {"unc://server/share/path/../../other", ParseError::Code::DirectoryTraversal,

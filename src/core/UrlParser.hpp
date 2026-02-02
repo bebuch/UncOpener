@@ -14,14 +14,13 @@ namespace uncopener
 struct UncPath
 {
     QString server;
-    QString share;
-    QString path; // Path after server/share, may be empty
+    QString path; // Path after server, may be empty
     bool hasTrailingSlash = false;
 
-    /// Returns the full UNC path string (e.g., "\\server\share\path")
+    /// Returns the full UNC path string (e.g., "\\server\path")
     [[nodiscard]] QString toUncString() const;
 
-    /// Returns the SMB URL for Linux (e.g., "smb://server/share/path")
+    /// Returns the SMB URL for Linux (e.g., "smb://server/path")
     [[nodiscard]] QString toSmbUrl(const QString& username = {}) const;
 };
 
@@ -36,7 +35,6 @@ struct ParseError
         InvalidSchemeFormat, // Single slash instead of double
         MissingAuthority,
         WhitespaceAuthority,
-        MissingShare,
         DirectoryTraversal,
         InvalidCharacter,
     };

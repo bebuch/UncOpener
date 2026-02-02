@@ -11,7 +11,7 @@ namespace uncopener
 
 QString UncPath::toUncString() const
 {
-    QString result = R"(\\)" + server + R"(\)" + share;
+    QString result = R"(\\)" + server;
     if (!path.isEmpty())
     {
         result += R"(\)" + path;
@@ -32,7 +32,7 @@ QString UncPath::toSmbUrl(const QString& username) const
         QString encodedUsername = QString::fromUtf8(QUrl::toPercentEncoding(username));
         result += encodedUsername + "@";
     }
-    result += server + "/" + share;
+    result += server;
     if (!path.isEmpty())
     {
         // Convert backslashes to forward slashes for SMB URLs
@@ -91,21 +91,16 @@ ParseError ParseError::create(Code code, const QString& input, const QString& ex
     case Code::InvalidSchemeFormat:
         error.reason = "Invalid URL format - expected '://' after scheme";
         error.remediation =
-            QString("Use double slash after the scheme (e.g., '%1://server/share').").arg(scheme);
+            QString("Use double slash after the scheme (e.g., '%1://server/path').").arg(scheme);
         break;
     case Code::MissingAuthority:
         error.reason = "No server name found in URL";
         error.remediation =
-            QString("The URL must include a server name (e.g., '%1://server/share').").arg(scheme);
+            QString("The URL must include a server name (e.g., '%1://server/path').").arg(scheme);
         break;
     case Code::WhitespaceAuthority:
         error.reason = "Server name contains only whitespace";
         error.remediation = "Provide a valid server name without leading/trailing spaces.";
-        break;
-    case Code::MissingShare:
-        error.reason = "No share name found in URL";
-        error.remediation =
-            QString("The URL must include a share name (e.g., '%1://server/share').").arg(scheme);
         break;
     case Code::DirectoryTraversal:
         error.reason = "Directory traversal detected (..)";
@@ -276,51 +271,18 @@ ParseResult UrlParser::parse(const QString& input) const
     // Percent-decode the authority (server name)
     QString server = percentDecode(authority);
 
-    // Extract share from path
-    if (pathPart.isEmpty())
+    // Everything else is the path
+    QString rawPath = pathPart;
+    bool hasTrailingSlash = false;
+
+    // Check if there's a trailing slash
+    if (!rawPath.isEmpty())
     {
-        return ParseError::create(ParseError::Code::MissingShare, input, m_schemeName);
+        hasTrailingSlash = rawPath.endsWith('/') || rawPath.endsWith('\\');
     }
 
-    // Find the share name (first path segment)
-    qsizetype shareSlash = pathPart.indexOf('/');
-    QString share;
-    QString remainingPath;
-    bool hasTrailingSlashAtShare = false;
-
-    if (shareSlash < 0)
-    {
-        share = pathPart;
-    }
-    else
-    {
-        share = pathPart.left(shareSlash);
-        remainingPath = pathPart.mid(shareSlash + 1);
-        // Check if there's a trailing slash at the share level (e.g., unc://server/share/)
-        if (remainingPath.isEmpty())
-        {
-            hasTrailingSlashAtShare = true;
-        }
-    }
-
-    // Check for empty share
-    if (share.isEmpty())
-    {
-        return ParseError::create(ParseError::Code::MissingShare, input, m_schemeName);
-    }
-
-    // Percent-decode share and path
-    share = percentDecode(share);
-
-    // Normalize the remaining path
-    bool hasTrailingSlash = hasTrailingSlashAtShare;
-    auto normalizedPath = normalizePath(remainingPath, hasTrailingSlash);
-    // If there was no remaining path but a trailing slash at share level, preserve it
-    if (hasTrailingSlashAtShare)
-    {
-        hasTrailingSlash = true;
-    }
-
+    // Normalize the path
+    auto normalizedPath = normalizePath(rawPath, hasTrailingSlash);
     if (!normalizedPath.has_value())
     {
         return ParseError::create(ParseError::Code::DirectoryTraversal, input);
@@ -329,7 +291,8 @@ ParseResult UrlParser::parse(const QString& input) const
     // Build the result
     UncPath result;
     result.server = server;
-    result.share = share;
+    // Decode logical path segments (normalizePath returns backslash-separated components)
+    // We want the path part of the UNC string to be properly decoded.
     result.path = percentDecode(normalizedPath.value());
     result.hasTrailingSlash = hasTrailingSlash;
 
