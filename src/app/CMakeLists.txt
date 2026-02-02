@@ -33,6 +33,15 @@ qt_add_resources(uncopener "app_icons"
     FILES ${CMAKE_SOURCE_DIR}/assets/icon.svg
 )
 
+# Skip clang-tidy for Qt-generated resource files
+# The RCC-generated files contain Qt macros that trigger false positives
+get_target_property(_uncopener_sources uncopener SOURCES)
+foreach(_source IN LISTS _uncopener_sources)
+    if(_source MATCHES "qrc_.*\\.cpp$")
+        set_source_files_properties(${_source} PROPERTIES SKIP_LINTING ON)
+    endif()
+endforeach()
+
 # Set Windows GUI subsystem
 if(WIN32)
     set_target_properties(uncopener PROPERTIES

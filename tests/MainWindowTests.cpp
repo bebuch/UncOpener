@@ -16,7 +16,7 @@ class MainWindowTest : public QObject
 
 private:
     // Helper to find widgets in MainWindow
-    template<typename T>
+    template <typename T>
     T* findWidget(MainWindow& window, const QString& partialName = QString())
     {
         QList<T*> widgets = window.findChildren<T*>();
@@ -228,7 +228,8 @@ private slots:
         // Clear scheme name
         schemeEdit->clear();
 
-        QVERIFY2(!saveButton->isEnabled(), "Save button should be disabled when scheme name is empty");
+        QVERIFY2(!saveButton->isEnabled(),
+                 "Save button should be disabled when scheme name is empty");
     }
 
     void testSaveButtonEnabledWhenUnsavedChanges()
@@ -396,7 +397,8 @@ private slots:
 
         // Should be normalized to have leading dot
         QString lastEntry = filetypeList->item(filetypeList->count() - 1)->text();
-        QVERIFY2(lastEntry.startsWith("."), qPrintable("Entry should start with dot, got: " + lastEntry));
+        QVERIFY2(lastEntry.startsWith("."),
+                 qPrintable("Entry should start with dot, got: " + lastEntry));
     }
 
     void testFiletypeModeComboChangesLabel()
@@ -471,8 +473,7 @@ private slots:
         filetypeEntry->setText(".test");
         QTest::keyClick(filetypeEntry, Qt::Key_Return);
 
-        QVERIFY2(!modeCombo->isEnabled(),
-                 "Mode combo should be disabled when list has entries");
+        QVERIFY2(!modeCombo->isEnabled(), "Mode combo should be disabled when list has entries");
     }
 
     // ========== Filetype List Persistence on Mode Switch ==========
