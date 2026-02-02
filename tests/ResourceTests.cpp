@@ -49,5 +49,10 @@ private slots:
     }
 };
 
-QTEST_MAIN(ResourcesTest)
+int runResourceTests(int argc, char* argv[])
+{
+    ResourcesTest test;
+    return QTest::qExec(&test, argc, argv);
+}
+
 #include "ResourceTests.moc"

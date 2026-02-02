@@ -52,7 +52,7 @@ private:
     {
         QList<QListWidget*> lists = window.findChildren<QListWidget*>();
         // UNC list is the first one (before filetype list)
-        return lists.size() >= 1 ? lists[0] : nullptr;
+        return !lists.empty() ? lists[0] : nullptr;
     }
 
     QListWidget* findFiletypeList(MainWindow& window)
@@ -405,6 +405,10 @@ private slots:
 
         QComboBox* modeCombo = findFiletypeModeCombo(window);
         QVERIFY(modeCombo);
+        if (modeCombo == nullptr)
+        {
+            return;
+        }
 
         // Find the label for filetype list
         QList<QLabel*> labels = window.findChildren<QLabel*>();
@@ -419,6 +423,10 @@ private slots:
             }
         }
         QVERIFY(filetypeLabel);
+        if (filetypeLabel == nullptr)
+        {
+            return;
+        }
 
         // Switch to blacklist mode
         modeCombo->setCurrentIndex(1);
