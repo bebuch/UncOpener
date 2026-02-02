@@ -25,16 +25,13 @@ Write-Host "Build directory: $BuildDir"
 Write-Host "Output directory: $OutputDir"
 Write-Host ""
 
-# Find the executable
-$ExePath = Join-Path $ProjectRoot "$BuildDir\Release\src\app\uncopener.exe"
+# Find the executable (Ninja Multi-Config: build/<target-dir>/<config>/<executable>)
+$ExePath = Join-Path $ProjectRoot "$BuildDir\src\app\Release\uncopener.exe"
 if (-not (Test-Path $ExePath)) {
-    # Try alternative path (single-config generator)
-    $ExePath = Join-Path $ProjectRoot "$BuildDir\src\app\uncopener.exe"
-}
-
-if (-not (Test-Path $ExePath)) {
-    Write-Host "ERROR: Cannot find uncopener.exe in $BuildDir" -ForegroundColor Red
-    Write-Host "Make sure you have built the project with Release configuration:" -ForegroundColor Yellow
+    Write-Host "ERROR: Cannot find uncopener.exe at $ExePath" -ForegroundColor Red
+    Write-Host "" -ForegroundColor Yellow
+    Write-Host "This project exclusively supports Ninja Multi-Config." -ForegroundColor Yellow
+    Write-Host "Build with the following commands:" -ForegroundColor Yellow
     Write-Host "  cmake --preset default" -ForegroundColor Yellow
     Write-Host "  cmake --build --preset release" -ForegroundColor Yellow
     exit 1

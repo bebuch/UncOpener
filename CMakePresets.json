@@ -22,16 +22,16 @@
         },
         {
             "name": "coverage",
-            "displayName": "Coverage",
-            "description": "Debug build with code coverage instrumentation",
-            "generator": "Ninja",
+            "displayName": "Coverage (Ninja Multi-Config)",
+            "description": "Multi-config build with code coverage instrumentation",
+            "generator": "Ninja Multi-Config",
             "binaryDir": "${sourceDir}/build/coverage",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
                 "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS": "--coverage",
-                "CMAKE_EXE_LINKER_FLAGS": "--coverage",
+                "CMAKE_CONFIGURATION_TYPES": "Debug",
+                "CMAKE_CXX_FLAGS_DEBUG": "--coverage",
+                "CMAKE_EXE_LINKER_FLAGS_DEBUG": "--coverage",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "UNCOPENER_WARNINGS_AS_ERRORS": "OFF"
             }
@@ -53,7 +53,8 @@
         {
             "name": "coverage",
             "displayName": "Coverage",
-            "configurePreset": "coverage"
+            "configurePreset": "coverage",
+            "configuration": "Debug"
         }
     ],
     "testPresets": [
@@ -79,6 +80,7 @@
             "name": "coverage",
             "displayName": "Coverage",
             "configurePreset": "coverage",
+            "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
             }
