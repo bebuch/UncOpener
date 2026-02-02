@@ -54,7 +54,7 @@ jobs:
 
   build-windows:
     name: Build Windows ZIP
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
 
