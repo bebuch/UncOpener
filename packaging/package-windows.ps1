@@ -90,6 +90,90 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+# Find and copy missing DLL dependencies using llvm-objdump
+Write-Host "Checking for missing DLL dependencies..." -ForegroundColor Cyan
+$QtBinDir = Split-Path $WinDeployQt -Parent
+
+# Find llvm-objdump (should be in same directory as Qt tools when using LLVM/Clang build)
+$LlvmObjdump = Get-Command llvm-objdump.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+if (-not $LlvmObjdump) {
+    $LlvmObjdump = Join-Path $QtBinDir "llvm-objdump.exe"
+}
+
+function Get-DllDependencies {
+    param([string]$FilePath)
+
+    if (-not (Test-Path $LlvmObjdump)) {
+        return @()
+    }
+
+    $output = & $LlvmObjdump -p $FilePath 2>$null
+    $deps = $output | Select-String "DLL Name:" | ForEach-Object {
+        ($_ -replace ".*DLL Name:\s*", "").Trim()
+    }
+    return $deps
+}
+
+function Copy-MissingDependencies {
+    param(
+        [string]$TargetDir,
+        [string]$SourceDir,
+        [ref]$ProcessedFiles
+    )
+
+    $allFiles = Get-ChildItem $TargetDir -Filter "*.dll" -Recurse
+    $allFiles += Get-ChildItem $TargetDir -Filter "*.exe"
+
+    $copiedAny = $false
+
+    foreach ($file in $allFiles) {
+        if ($ProcessedFiles.Value -contains $file.FullName) {
+            continue
+        }
+        $ProcessedFiles.Value += $file.FullName
+
+        $deps = Get-DllDependencies -FilePath $file.FullName
+        foreach ($dep in $deps) {
+            # Skip system DLLs
+            if ($dep -match "^(KERNEL32|USER32|GDI32|SHELL32|ADVAPI32|ole32|OLEAUT32|COMDLG32|WINSPOOL|COMCTL32|IMM32|WINMM|WS2_32|VERSION|SHLWAPI|CRYPT32|NETAPI32|SECUR32|USERENV|MPR|SETUPAPI|BCRYPT|NCRYPT|NTDLL|msvcrt|VCRUNTIME|MSVCP|api-ms-win|ext-ms-win|ucrtbase)") {
+                continue
+            }
+
+            $depInTarget = Join-Path $TargetDir $dep
+            if (-not (Test-Path $depInTarget)) {
+                $depInSource = Join-Path $SourceDir $dep
+                if (Test-Path $depInSource) {
+                    Write-Host "  Copying missing dependency: $dep" -ForegroundColor Yellow
+                    Copy-Item $depInSource $TargetDir
+                    $copiedAny = $true
+                }
+            }
+        }
+    }
+
+    return $copiedAny
+}
+
+if (-not (Test-Path $LlvmObjdump)) {
+    Write-Host "ERROR: llvm-objdump not found, cannot resolve DLL dependencies" -ForegroundColor Red
+    Write-Host "       Install LLVM or add llvm-objdump.exe to PATH" -ForegroundColor Yellow
+    exit 1
+}
+
+$processed = @()
+$iteration = 0
+$maxIterations = 10
+
+do {
+    $iteration++
+    $copiedAny = Copy-MissingDependencies -TargetDir $StageDir -SourceDir $QtBinDir -ProcessedFiles ([ref]$processed)
+} while ($copiedAny -and $iteration -lt $maxIterations)
+
+if ($iteration -ge $maxIterations) {
+    Write-Host "ERROR: Reached maximum iterations while resolving dependencies" -ForegroundColor Red
+    exit 1
+}
+
 # Create README for the package
 $ReadmeContent = @"
 # $AppName $Version
@@ -110,7 +194,7 @@ The registration is per-user (HKEY_CURRENT_USER) and does not require administra
 
 ## Usage
 
-Once registered, clicking links like 'unc://server/share/path' in your browser
+Once registered, clicking links like 'uncopener://server/path/to/resource' in your browser
 will open the corresponding UNC path in Windows Explorer.
 
 ## Uninstallation

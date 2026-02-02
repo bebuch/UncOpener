@@ -14,14 +14,13 @@ namespace uncopener
 struct UncPath
 {
     QString server;
-    QString share;
-    QString path; // Path after server/share, may be empty
+    QString path; // Path after server, may be empty
     bool hasTrailingSlash = false;
 
-    /// Returns the full UNC path string (e.g., "\\server\share\path")
+    /// Returns the full UNC path string (e.g., "\\server\path")
     [[nodiscard]] QString toUncString() const;
 
-    /// Returns the SMB URL for Linux (e.g., "smb://server/share/path")
+    /// Returns the SMB URL for Linux (e.g., "smb://server/path")
     [[nodiscard]] QString toSmbUrl(const QString& username = {}) const;
 };
 
@@ -36,7 +35,6 @@ struct ParseError
         InvalidSchemeFormat, // Single slash instead of double
         MissingAuthority,
         WhitespaceAuthority,
-        MissingShare,
         DirectoryTraversal,
         InvalidCharacter,
     };
@@ -47,7 +45,9 @@ struct ParseError
     QString input;       // The original input that failed
 
     /// Creates a ParseError with localized messages
-    [[nodiscard]] static ParseError create(Code code, const QString& input);
+    [[nodiscard]] static ParseError create(Code code, const QString& input,
+                                           const QString& expectedScheme = {},
+                                           const QString& foundScheme = {});
 };
 
 /// Result type for URL parsing: either a UncPath or a ParseError
@@ -75,6 +75,12 @@ private:
     /// Returns nullopt if directory traversal (..) is detected
     [[nodiscard]] static std::optional<QString> normalizePath(const QString& path,
                                                               bool& hasTrailingSlash);
+
+    /// Check if the input starts with the correct scheme
+    [[nodiscard]] std::optional<ParseError> checkScheme(const QString& input) const;
+
+    /// Remove query and fragment from the input
+    [[nodiscard]] static QString stripQueryAndFragment(const QString& input);
 };
 
 /// Helper functions for working with ParseResult

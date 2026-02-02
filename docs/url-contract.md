@@ -7,14 +7,13 @@ This document defines the URL handling rules for UncOpener. These rules form the
 The extension produces URLs in the following format:
 
 ```
-scheme://server/share/path/to/resource
+scheme://server/path/to/resource
 ```
 
 Where:
 - `scheme` is the custom scheme name configured by the user (default: `uncopener`)
 - `server` is the network server name (the URL authority/host)
-- `share` is the share name on the server
-- `path/to/resource` is the optional path within the share
+- `path/to/resource` is the full path on the server
 
 **Important**: The extension does NOT use the `scheme:server/...` format. The double-slash (`://`) is always present.
 
@@ -54,25 +53,23 @@ A URL is **valid** if and only if:
 1. **Scheme present**: URL starts with the configured scheme followed by `://`
 2. **Authority present**: A non-empty server name follows the `://`
 3. **No directory traversal**: Path contains no `..` segments
-4. **UNC structure**: Path represents a valid UNC path structure (at minimum `//server/share`)
 
 A URL is **invalid** if any of the following conditions apply:
 
 | Condition | Example | Reason |
 |-----------|---------|--------|
-| Missing scheme | `//server/share` | No scheme identifier |
-| Wrong scheme | `http://server/share` | Scheme mismatch |
-| Missing authority | `uncopener:///share/path` | Empty server name |
-| Single slash | `uncopener:/server/share` | Invalid URL format |
-| Directory traversal | `uncopener://server/share/../other` | Security risk |
-| Empty path | `uncopener://server` | No share specified |
+| Missing scheme | `//server/path` | No scheme identifier |
+| Wrong scheme | `http://server/path` | Scheme mismatch |
+| Missing authority | `uncopener:///path` | Empty server name |
+| Single slash | `uncopener:/server/path` | Invalid URL format |
+| Directory traversal | `uncopener://server/path/../other` | Security risk |
 
 ## Query and Fragment Handling
 
 Query strings (`?...`) and fragments (`#...`) in URLs are **ignored**:
 
-- `uncopener://server/share/file?query=value` opens `\\server\share\file`
-- `uncopener://server/share/file#anchor` opens `\\server\share\file`
+- `uncopener://server/path/file?query=value` opens `\\server\path\file`
+- `uncopener://server/path/file#anchor` opens `\\server\path\file`
 
 This behavior is chosen because:
 1. UNC paths do not support query strings or fragments
@@ -85,14 +82,14 @@ This behavior is chosen because:
 
 Before opening any path, UncOpener verifies the URL against the configured UNC allow-list:
 
-1. The URL is converted to canonical UNC format: `\\server\share\path...`
+1. The URL is converted to canonical UNC format: `\\server\path...`
 2. The UNC path must start with one of the entries in the allow-list
 3. Comparison is case-insensitive (Windows path semantics)
 
 Allow-list entries:
-- Use backslash separators (`\\server\share`)
+- Use backslash separators (`\\server\path`)
 - Are auto-normalized (forward slashes rejected in configuration)
-- Match as prefixes (entry `\\server\share` matches `\\server\share\any\path`)
+- Match as prefixes (entry `\\server\path` matches `\\server\path\sub\folder`)
 
 ## Platform-Specific Output
 

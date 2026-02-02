@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <QTest>
 
 // Test classes are registered via QTEST_APPLESS_MAIN in individual test files
@@ -5,6 +6,7 @@
 
 int main(int argc, char* argv[])
 {
+    QCoreApplication app(argc, argv);
     int status = 0;
 
     // Run placeholder tests
@@ -35,6 +37,12 @@ int main(int argc, char* argv[])
     {
         extern int runPathOpenerTests(int argc, char* argv[]);
         status |= runPathOpenerTests(argc, argv);
+    }
+
+    // Run scheme registry tests
+    {
+        extern int runSchemeRegistryTests(int argc, char* argv[]);
+        status |= runSchemeRegistryTests(argc, argv);
     }
 
     return status;

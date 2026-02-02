@@ -39,7 +39,13 @@ void MainWindow::setupUi()
     auto* uncLayout = new QVBoxLayout(uncGroup);
 
     auto* uncHintLabel = new QLabel("If empty, all UNC paths are allowed.", uncGroup);
-    uncHintLabel->setStyleSheet("color: gray; font-style: italic;");
+    QFont hintFont = uncHintLabel->font();
+    hintFont.setItalic(true);
+    uncHintLabel->setFont(hintFont);
+    QPalette hintPalette = uncHintLabel->palette();
+    hintPalette.setColor(QPalette::WindowText,
+                         hintPalette.color(QPalette::Disabled, QPalette::WindowText));
+    uncHintLabel->setPalette(hintPalette);
     uncLayout->addWidget(uncHintLabel);
 
     m_uncAllowList = new QListWidget(uncGroup);
@@ -47,7 +53,7 @@ void MainWindow::setupUi()
 
     auto* uncEntryLayout = new QHBoxLayout();
     m_uncEntryEdit = new QLineEdit(uncGroup);
-    m_uncEntryEdit->setPlaceholderText(R"(\\server\share)");
+    m_uncEntryEdit->setPlaceholderText(R"(\\server\path)");
     uncEntryLayout->addWidget(m_uncEntryEdit);
 
     m_addUncButton = new QPushButton("Add", uncGroup);
@@ -124,6 +130,19 @@ void MainWindow::setupUi()
     pathLayout->addLayout(pathFormLayout);
     mainLayout->addWidget(pathGroup);
 
+    // Status and save
+    auto* bottomLayout = new QHBoxLayout();
+    m_statusLabel = new QLabel(centralWidget);
+    bottomLayout->addWidget(m_statusLabel);
+    bottomLayout->addStretch();
+    m_saveButton = new QPushButton("Save", centralWidget);
+    m_saveButton->setEnabled(false);
+    connect(m_saveButton, &QPushButton::clicked, this, &MainWindow::onSaveClicked);
+    bottomLayout->addWidget(m_saveButton);
+    mainLayout->addLayout(bottomLayout);
+
+    setCentralWidget(centralWidget);
+
     // Scheme registration section
     auto* registrationGroup = new QGroupBox("Scheme Registration", centralWidget);
     auto* registrationLayout = new QVBoxLayout(registrationGroup);
@@ -144,19 +163,6 @@ void MainWindow::setupUi()
     connect(m_unregisterButton, &QPushButton::clicked, this, &MainWindow::onUnregisterClicked);
 
     mainLayout->addWidget(registrationGroup);
-
-    // Status and save
-    auto* bottomLayout = new QHBoxLayout();
-    m_statusLabel = new QLabel(centralWidget);
-    bottomLayout->addWidget(m_statusLabel);
-    bottomLayout->addStretch();
-    m_saveButton = new QPushButton("Save", centralWidget);
-    m_saveButton->setEnabled(false);
-    connect(m_saveButton, &QPushButton::clicked, this, &MainWindow::onSaveClicked);
-    bottomLayout->addWidget(m_saveButton);
-    mainLayout->addLayout(bottomLayout);
-
-    setCentralWidget(centralWidget);
 }
 
 void MainWindow::loadConfig()
@@ -262,15 +268,17 @@ void MainWindow::validateAndUpdateStatus()
         hasWarnings = true;
     }
 
+    QPalette palette = m_statusLabel->palette();
     if (hasWarnings)
     {
-        m_statusLabel->setStyleSheet("color: orange;");
+        palette.setColor(QPalette::WindowText, QColor(255, 140, 0)); // Dark orange
     }
     else
     {
         status = "Configuration valid";
-        m_statusLabel->setStyleSheet("color: green;");
+        palette.setColor(QPalette::WindowText, Qt::blue); // Use blue for valid state to be safe
     }
+    m_statusLabel->setPalette(palette);
 
     m_statusLabel->setText(status);
 }
@@ -296,7 +304,9 @@ void MainWindow::onSaveClicked()
     {
         setModified(false);
         m_statusLabel->setText("Configuration saved");
-        m_statusLabel->setStyleSheet("color: green;");
+        QPalette palette = m_statusLabel->palette();
+        palette.setColor(QPalette::WindowText, Qt::darkGreen);
+        m_statusLabel->setPalette(palette);
     }
     else
     {
@@ -405,23 +415,27 @@ void MainWindow::updateRegistrationStatus()
 {
     QString schemeName = m_schemeNameEdit->text().trimmed();
 
+    // Reset palette
+    m_registrationStatusLabel->setPalette(QPalette());
+
     if (schemeName.isEmpty())
     {
         m_registrationStatusLabel->setText("Enter a scheme name to check registration status.");
-        m_registrationStatusLabel->setStyleSheet("");
         m_registerButton->setEnabled(false);
         m_unregisterButton->setEnabled(false);
         return;
     }
 
     uncopener::RegistrationStatus status = m_registry->checkRegistration(schemeName);
+    QPalette palette = m_registrationStatusLabel->palette();
 
     switch (status)
     {
     case uncopener::RegistrationStatus::NotRegistered:
         m_registrationStatusLabel->setText(
             QString("Scheme '%1' is not registered.").arg(schemeName));
-        m_registrationStatusLabel->setStyleSheet("color: gray;");
+        palette.setColor(QPalette::WindowText,
+                         palette.color(QPalette::Disabled, QPalette::WindowText));
         m_registerButton->setEnabled(true);
         m_unregisterButton->setEnabled(false);
         break;
@@ -429,7 +443,7 @@ void MainWindow::updateRegistrationStatus()
     case uncopener::RegistrationStatus::RegisteredToThisBinary:
         m_registrationStatusLabel->setText(
             QString("Scheme '%1' is registered to this application.").arg(schemeName));
-        m_registrationStatusLabel->setStyleSheet("color: green;");
+        palette.setColor(QPalette::WindowText, Qt::darkGreen);
         m_registerButton->setEnabled(false);
         m_unregisterButton->setEnabled(true);
         break;
@@ -440,12 +454,13 @@ void MainWindow::updateRegistrationStatus()
         m_registrationStatusLabel->setText(
             QString("Scheme '%1' is registered to another application:\n%2")
                 .arg(schemeName, otherPath));
-        m_registrationStatusLabel->setStyleSheet("color: orange;");
+        palette.setColor(QPalette::WindowText, QColor(255, 140, 0)); // Dark orange
         m_registerButton->setEnabled(true);
         m_unregisterButton->setEnabled(true);
         break;
     }
     }
+    m_registrationStatusLabel->setPalette(palette);
 }
 
 void MainWindow::onRegisterClicked()

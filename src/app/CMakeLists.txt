@@ -1,4 +1,4 @@
-add_executable(uncopener WIN32
+add_executable(uncopener
     main.cpp
     MainWindow.cpp
     MainWindow.hpp
@@ -8,6 +8,15 @@ add_executable(uncopener WIN32
     AppIcon.hpp
     resources.qrc
 )
+
+# Set Windows GUI subsystem
+if(WIN32)
+    set_target_properties(uncopener PROPERTIES
+        WIN32_EXECUTABLE TRUE
+    )
+    # Note: lld-link will warn "found both wWinMain and WinMain" when linking
+    # Qt6::EntryPoint - this is harmless as Qt provides both for compatibility
+endif()
 
 target_link_libraries(uncopener PRIVATE
     uncopener_core

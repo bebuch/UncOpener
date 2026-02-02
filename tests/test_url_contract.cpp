@@ -31,20 +31,25 @@ private:
     static QVector<ValidUrlTestCase> validUrls()
     {
         return {
-            {"unc://server/share", R"(\\server\share)", "Minimal valid path"},
-            {"unc://server/share/", R"(\\server\share\)", "Trailing slash preserved"},
-            {"unc://server/share/path", R"(\\server\share\path)", "Path component"},
-            {"unc://server/share/path/file.txt", R"(\\server\share\path\file.txt)", "Full path"},
-            {"unc://server/share/path%20name", R"(\\server\share\path name)",
+            {"uncopener://server", R"(\\server)", "Server only"},
+            {"uncopener://server/", R"(\\server\)", "Server with trailing slash"},
+            {"uncopener://server/share", R"(\\server\share)", "Minimal valid path"},
+            {"uncopener://server/share/", R"(\\server\share\)", "Trailing slash preserved"},
+            {"uncopener://server/share/path", R"(\\server\share\path)", "Path component"},
+            {"uncopener://server/share/path/file.txt", R"(\\server\share\path\file.txt)",
+             "Full path"},
+            {"uncopener://server/share/path%20name", R"(\\server\share\path name)",
              "Percent-encoded space"},
-            {"unc://server/share/path name", R"(\\server\share\path name)", "Literal space"},
-            {"unc://server/share/file%23name", R"(\\server\share\file#name)",
+            {"uncopener://server/share/path name", R"(\\server\share\path name)", "Literal space"},
+            {"uncopener://server/share/file%23name", R"(\\server\share\file#name)",
              "Percent-encoded hash"},
-            {"unc://server/share/./file", R"(\\server\share\file)", "Dot segment removed"},
-            {"unc://server/share//path", R"(\\server\share\path)", "Double slash collapsed"},
-            {"unc://SERVER/SHARE/path", R"(\\SERVER\SHARE\path)", "Case preserved"},
-            {"unc://server/share/path?query=value", R"(\\server\share\path)", "Query ignored"},
-            {"unc://server/share/path#fragment", R"(\\server\share\path)", "Fragment ignored"},
+            {"uncopener://server/share/./file", R"(\\server\share\file)", "Dot segment removed"},
+            {"uncopener://server/share//path", R"(\\server\share\path)", "Double slash collapsed"},
+            {"uncopener://SERVER/SHARE/path", R"(\\SERVER\SHARE\path)", "Case preserved"},
+            {"uncopener://server/share/path?query=value", R"(\\server\share\path)",
+             "Query ignored"},
+            {"uncopener://server/share/path#fragment", R"(\\server\share\path)",
+             "Fragment ignored"},
         };
     }
 
@@ -53,18 +58,17 @@ private:
     {
         return {
             {"//server/share", ParseError::Code::MissingScheme, "Missing scheme"},
-            {"unc:/server/share", ParseError::Code::InvalidSchemeFormat,
+            {"uncopener:/server/share", ParseError::Code::InvalidSchemeFormat,
              "Single slash (invalid format)"},
-            {"unc:///share", ParseError::Code::MissingAuthority, "Missing authority"},
-            {"unc://server", ParseError::Code::MissingShare, "Missing share"},
-            {"unc://server/share/../other", ParseError::Code::DirectoryTraversal,
+            {"uncopener:///share", ParseError::Code::MissingAuthority, "Missing authority"},
+            {"uncopener://server/share/../other", ParseError::Code::DirectoryTraversal,
              "Directory traversal"},
-            {"unc://server/share/path/../../other", ParseError::Code::DirectoryTraversal,
+            {"uncopener://server/share/path/../../other", ParseError::Code::DirectoryTraversal,
              "Directory traversal (multiple)"},
             {"http://server/share", ParseError::Code::WrongScheme, "Wrong scheme"},
             {"", ParseError::Code::EmptyInput, "Empty input"},
-            {"unc://", ParseError::Code::MissingAuthority, "Missing authority and path"},
-            {"unc:// /share", ParseError::Code::WhitespaceAuthority, "Whitespace authority"},
+            {"uncopener://", ParseError::Code::MissingAuthority, "Missing authority and path"},
+            {"uncopener:// /share", ParseError::Code::WhitespaceAuthority, "Whitespace authority"},
         };
     }
 
@@ -86,7 +90,7 @@ private slots:
         QFETCH(QString, input);
         QFETCH(QString, expectedUncPath);
 
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
         ParseResult result = parser.parse(input);
 
         QVERIFY2(isSuccess(result),
@@ -114,7 +118,7 @@ private slots:
         QFETCH(QString, input);
         QFETCH(int, expectedCode);
 
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
         ParseResult result = parser.parse(input);
 
         QVERIFY2(isError(result),
@@ -126,11 +130,11 @@ private slots:
 
     void testTrailingSlashPreservation()
     {
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
 
         // Without trailing slash
         {
-            ParseResult result = parser.parse("unc://server/share/path");
+            ParseResult result = parser.parse("uncopener://server/share/path");
             QVERIFY(isSuccess(result));
             QVERIFY(!getPath(result).hasTrailingSlash);
             QVERIFY(!getPath(result).toUncString().endsWith('\\'));
@@ -138,7 +142,7 @@ private slots:
 
         // With trailing slash
         {
-            ParseResult result = parser.parse("unc://server/share/path/");
+            ParseResult result = parser.parse("uncopener://server/share/path/");
             QVERIFY(isSuccess(result));
             QVERIFY(getPath(result).hasTrailingSlash);
             QVERIFY(getPath(result).toUncString().endsWith('\\'));
@@ -147,25 +151,25 @@ private slots:
 
     void testSmbUrlGeneration()
     {
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
 
         // Basic SMB URL
         {
-            ParseResult result = parser.parse("unc://server/share/path");
+            ParseResult result = parser.parse("uncopener://server/share/path");
             QVERIFY(isSuccess(result));
             QCOMPARE(getPath(result).toSmbUrl(), "smb://server/share/path");
         }
 
         // SMB URL with username
         {
-            ParseResult result = parser.parse("unc://server/share/path");
+            ParseResult result = parser.parse("uncopener://server/share/path");
             QVERIFY(isSuccess(result));
             QCOMPARE(getPath(result).toSmbUrl("myuser"), "smb://myuser@server/share/path");
         }
 
         // SMB URL with domain username
         {
-            ParseResult result = parser.parse("unc://server/share/path");
+            ParseResult result = parser.parse("uncopener://server/share/path");
             QVERIFY(isSuccess(result));
             QString smbUrl = getPath(result).toSmbUrl(R"(DOMAIN\user)");
             QVERIFY(smbUrl.contains("DOMAIN%5Cuser@"));
@@ -173,7 +177,7 @@ private slots:
 
         // SMB URL with trailing slash
         {
-            ParseResult result = parser.parse("unc://server/share/path/");
+            ParseResult result = parser.parse("uncopener://server/share/path/");
             QVERIFY(isSuccess(result));
             QVERIFY(getPath(result).toSmbUrl().endsWith('/'));
         }
@@ -193,7 +197,7 @@ private slots:
 
         // Should fail with different scheme
         {
-            ParseResult result = parser.parse("unc://server/share");
+            ParseResult result = parser.parse("uncopener://server/share");
             QVERIFY(isError(result));
             QCOMPARE(getError(result).code, ParseError::Code::WrongScheme);
         }
@@ -201,44 +205,44 @@ private slots:
 
     void testPercentDecoding()
     {
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
 
         // Percent-encoded space
         {
-            ParseResult result = parser.parse("unc://server/share/my%20file.txt");
+            ParseResult result = parser.parse("uncopener://server/share/my%20file.txt");
             QVERIFY(isSuccess(result));
-            QCOMPARE(getPath(result).path, "my file.txt");
+            QCOMPARE(getPath(result).path, R"(share\my file.txt)");
         }
 
         // Percent-encoded special characters
         {
-            ParseResult result = parser.parse("unc://server/share/file%23name");
+            ParseResult result = parser.parse("uncopener://server/share/file%23name");
             QVERIFY(isSuccess(result));
-            QCOMPARE(getPath(result).path, "file#name");
+            QCOMPARE(getPath(result).path, R"(share\file#name)");
         }
 
         // Mixed percent-encoded and literal
         {
-            ParseResult result = parser.parse("unc://server/share/path%20with spaces");
+            ParseResult result = parser.parse("uncopener://server/share/path%20with spaces");
             QVERIFY(isSuccess(result));
-            QCOMPARE(getPath(result).path, "path with spaces");
+            QCOMPARE(getPath(result).path, R"(share\path with spaces)");
         }
     }
 
     void testSlashCollapsing()
     {
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
 
         // Double slashes in path
         {
-            ParseResult result = parser.parse("unc://server/share//path//file");
+            ParseResult result = parser.parse("uncopener://server/share//path//file");
             QVERIFY(isSuccess(result));
             QCOMPARE(getPath(result).toUncString(), R"(\\server\share\path\file)");
         }
 
         // Multiple consecutive slashes
         {
-            ParseResult result = parser.parse("unc://server/share///path");
+            ParseResult result = parser.parse("uncopener://server/share///path");
             QVERIFY(isSuccess(result));
             QCOMPARE(getPath(result).toUncString(), R"(\\server\share\path)");
         }
@@ -246,7 +250,7 @@ private slots:
 
     void testErrorMessages()
     {
-        UrlParser parser("unc");
+        UrlParser parser("uncopener");
 
         // Verify error messages are populated
         ParseResult result = parser.parse("");
@@ -256,6 +260,20 @@ private slots:
         QVERIFY(!error.reason.isEmpty());
         QVERIFY(!error.remediation.isEmpty());
         QCOMPARE(error.input, "");
+    }
+
+    void testDetailedWrongSchemeError()
+    {
+        UrlParser parser("uncopener");
+
+        // Test with a recognizable scheme
+        ParseResult result = parser.parse("http://example.com");
+        QVERIFY(isError(result));
+        const ParseError& error = getError(result);
+
+        QCOMPARE(error.code, ParseError::Code::WrongScheme);
+        QVERIFY(error.reason.contains("http"));
+        QVERIFY(error.remediation.contains("uncopener"));
     }
 };
 

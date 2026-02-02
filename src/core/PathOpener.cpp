@@ -26,9 +26,8 @@ bool PathOpener::openUrl(const QString& url)
 {
 #ifdef Q_OS_WIN
     // On Windows, convert UNC path to file:// URL for QDesktopServices
-    // QDesktopServices::openUrl works better with file:// URLs
-    QString fileUrl = "file:" + url;
-    return QDesktopServices::openUrl(QUrl(fileUrl, QUrl::TolerantMode));
+    // Use fromLocalFile to correctly handle UNC paths and special characters
+    return QDesktopServices::openUrl(QUrl::fromLocalFile(url));
 #else
     // On Linux, use the SMB URL directly
     return QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
