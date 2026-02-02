@@ -257,6 +257,20 @@ private slots:
         QVERIFY(!error.remediation.isEmpty());
         QCOMPARE(error.input, "");
     }
+
+    void testDetailedWrongSchemeError()
+    {
+        UrlParser parser("unc");
+
+        // Test with a recognizable scheme
+        ParseResult result = parser.parse("http://example.com");
+        QVERIFY(isError(result));
+        const ParseError& error = getError(result);
+
+        QCOMPARE(error.code, ParseError::Code::WrongScheme);
+        QVERIFY(error.reason.contains("http"));
+        QVERIFY(error.remediation.contains("unc"));
+    }
 };
 
 int runUrlContractTests(int argc, char* argv[])

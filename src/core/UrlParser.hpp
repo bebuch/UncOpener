@@ -47,7 +47,9 @@ struct ParseError
     QString input;       // The original input that failed
 
     /// Creates a ParseError with localized messages
-    [[nodiscard]] static ParseError create(Code code, const QString& input);
+    [[nodiscard]] static ParseError create(Code code, const QString& input,
+                                           const QString& expectedScheme = {},
+                                           const QString& foundScheme = {});
 };
 
 /// Result type for URL parsing: either a UncPath or a ParseError
@@ -75,6 +77,12 @@ private:
     /// Returns nullopt if directory traversal (..) is detected
     [[nodiscard]] static std::optional<QString> normalizePath(const QString& path,
                                                               bool& hasTrailingSlash);
+
+    /// Check if the input starts with the correct scheme
+    [[nodiscard]] std::optional<ParseError> checkScheme(const QString& input) const;
+
+    /// Remove query and fragment from the input
+    [[nodiscard]] static QString stripQueryAndFragment(const QString& input);
 };
 
 /// Helper functions for working with ParseResult

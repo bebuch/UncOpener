@@ -47,11 +47,14 @@ QString UncPath::toSmbUrl(const QString& username) const
     return result;
 }
 
-ParseError ParseError::create(Code code, const QString& input)
+ParseError ParseError::create(Code code, const QString& input, const QString& expectedScheme,
+                              const QString& foundScheme)
 {
     ParseError error;
     error.code = code;
     error.input = input;
+
+    QString scheme = expectedScheme.isEmpty() ? "uncopener" : expectedScheme;
 
     switch (code)
     {
@@ -61,19 +64,39 @@ ParseError ParseError::create(Code code, const QString& input)
         break;
     case Code::MissingScheme:
         error.reason = "No URL scheme found in input";
-        error.remediation = "The URL must start with a scheme followed by '://' (e.g., 'unc://').";
+        error.remediation = QString("The URL must start with a scheme followed by '://' (e.g., "
+                                    "'%1://').")
+                                .arg(scheme);
         break;
     case Code::WrongScheme:
-        error.reason = "URL has incorrect scheme";
-        error.remediation = "The URL must use the configured scheme.";
+        if (!foundScheme.isEmpty())
+        {
+            error.reason = QString("URL has incorrect scheme \"%1\"").arg(foundScheme);
+        }
+        else
+        {
+            error.reason = "URL has incorrect scheme";
+        }
+
+        if (!expectedScheme.isEmpty())
+        {
+            error.remediation =
+                QString("The URL must use the configured scheme \"%1\".").arg(expectedScheme);
+        }
+        else
+        {
+            error.remediation = "The URL must use the configured scheme.";
+        }
         break;
     case Code::InvalidSchemeFormat:
         error.reason = "Invalid URL format - expected '://' after scheme";
-        error.remediation = "Use double slash after the scheme (e.g., 'unc://server/share').";
+        error.remediation =
+            QString("Use double slash after the scheme (e.g., '%1://server/share').").arg(scheme);
         break;
     case Code::MissingAuthority:
         error.reason = "No server name found in URL";
-        error.remediation = "The URL must include a server name (e.g., 'unc://server/share').";
+        error.remediation =
+            QString("The URL must include a server name (e.g., '%1://server/share').").arg(scheme);
         break;
     case Code::WhitespaceAuthority:
         error.reason = "Server name contains only whitespace";
@@ -81,7 +104,8 @@ ParseError ParseError::create(Code code, const QString& input)
         break;
     case Code::MissingShare:
         error.reason = "No share name found in URL";
-        error.remediation = "The URL must include a share name (e.g., 'unc://server/share').";
+        error.remediation =
+            QString("The URL must include a share name (e.g., '%1://server/share').").arg(scheme);
         break;
     case Code::DirectoryTraversal:
         error.reason = "Directory traversal detected (..)";
@@ -142,21 +166,15 @@ std::optional<QString> UrlParser::normalizePath(const QString& path, bool& hasTr
     return resultSegments.join('\\');
 }
 
-ParseResult UrlParser::parse(const QString& input) const
+std::optional<ParseError> UrlParser::checkScheme(const QString& input) const
 {
-    if (input.isEmpty())
-    {
-        return ParseError::create(ParseError::Code::EmptyInput, input);
-    }
-
-    // Expected format: scheme://server/share/path
     QString schemePrefix = m_schemeName + "://";
     QString singleSlashPrefix = m_schemeName + ":/";
 
     // Check for single slash format (invalid)
     if (input.startsWith(singleSlashPrefix) && !input.startsWith(schemePrefix))
     {
-        return ParseError::create(ParseError::Code::InvalidSchemeFormat, input);
+        return ParseError::create(ParseError::Code::InvalidSchemeFormat, input, m_schemeName);
     }
 
     // Check scheme
@@ -164,19 +182,27 @@ ParseResult UrlParser::parse(const QString& input) const
     {
         // Check if there's a different scheme
         qsizetype colonPos = input.indexOf(':');
-        if (colonPos > 0 && colonPos < input.indexOf('/'))
+        if (colonPos > 0)
         {
-            return ParseError::create(ParseError::Code::WrongScheme, input);
+            // Ensure colon is before any path separator causing it to look like a scheme
+            qsizetype slashPos = input.indexOf('/');
+            if (slashPos < 0 || colonPos < slashPos)
+            {
+                QString foundScheme = input.left(colonPos);
+                return ParseError::create(ParseError::Code::WrongScheme, input, m_schemeName,
+                                          foundScheme);
+            }
         }
-        return ParseError::create(ParseError::Code::MissingScheme, input);
+        return ParseError::create(ParseError::Code::MissingScheme, input, m_schemeName);
     }
 
-    // Extract the part after scheme://
-    QString remainder = input.mid(schemePrefix.length());
+    return std::nullopt;
+}
 
-    // Remove query string and fragment (they are ignored per the contract)
-    qsizetype queryPos = remainder.indexOf('?');
-    qsizetype fragmentPos = remainder.indexOf('#');
+QString UrlParser::stripQueryAndFragment(const QString& input)
+{
+    qsizetype queryPos = input.indexOf('?');
+    qsizetype fragmentPos = input.indexOf('#');
 
     qsizetype cutPos = -1;
     if (queryPos >= 0 && fragmentPos >= 0)
@@ -194,8 +220,31 @@ ParseResult UrlParser::parse(const QString& input) const
 
     if (cutPos >= 0)
     {
-        remainder = remainder.left(cutPos);
+        return input.left(cutPos);
     }
+    return input;
+}
+
+ParseResult UrlParser::parse(const QString& input) const
+{
+    if (input.isEmpty())
+    {
+        return ParseError::create(ParseError::Code::EmptyInput, input);
+    }
+
+    if (auto error = checkScheme(input))
+    {
+        return *error;
+    }
+
+    // Expected format: scheme://server/share/path
+    QString schemePrefix = m_schemeName + "://";
+
+    // Extract the part after scheme://
+    QString remainder = input.mid(schemePrefix.length());
+
+    // Remove query string and fragment (they are ignored per the contract)
+    remainder = stripQueryAndFragment(remainder);
 
     // Split by forward slash to get authority and path
     qsizetype firstSlash = remainder.indexOf('/');
@@ -217,11 +266,11 @@ ParseResult UrlParser::parse(const QString& input) const
     // Check for empty or whitespace-only authority
     if (authority.isEmpty())
     {
-        return ParseError::create(ParseError::Code::MissingAuthority, input);
+        return ParseError::create(ParseError::Code::MissingAuthority, input, m_schemeName);
     }
     if (authority.trimmed().isEmpty())
     {
-        return ParseError::create(ParseError::Code::WhitespaceAuthority, input);
+        return ParseError::create(ParseError::Code::WhitespaceAuthority, input, m_schemeName);
     }
 
     // Percent-decode the authority (server name)
@@ -230,7 +279,7 @@ ParseResult UrlParser::parse(const QString& input) const
     // Extract share from path
     if (pathPart.isEmpty())
     {
-        return ParseError::create(ParseError::Code::MissingShare, input);
+        return ParseError::create(ParseError::Code::MissingShare, input, m_schemeName);
     }
 
     // Find the share name (first path segment)
@@ -257,7 +306,7 @@ ParseResult UrlParser::parse(const QString& input) const
     // Check for empty share
     if (share.isEmpty())
     {
-        return ParseError::create(ParseError::Code::MissingShare, input);
+        return ParseError::create(ParseError::Code::MissingShare, input, m_schemeName);
     }
 
     // Percent-decode share and path

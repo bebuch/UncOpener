@@ -3,6 +3,8 @@
 
 #include <QApplication>
 #include <QIcon>
+#include <QLabel>
+#include <QLineEdit>
 #include <QTest>
 
 class DialogsTest : public QObject
@@ -99,6 +101,27 @@ private slots:
         QVERIFY(window.minimumWidth() >= 600);
         QVERIFY(window.minimumHeight() >= 700);
     }
+
+    void testErrorDialogWidgetsAccessible()
+    {
+        ErrorDialog dialog("test://url", "Test reason", "Test remediation");
+
+        auto* inputHeader = dialog.findChild<QLabel*>("inputHeader");
+        QVERIFY(inputHeader);
+        auto* inputValue = dialog.findChild<QLineEdit*>("inputValue");
+        QVERIFY(inputValue);
+
+        auto* reasonHeader = dialog.findChild<QLabel*>("reasonHeader");
+        QVERIFY(reasonHeader);
+        auto* reasonValue = dialog.findChild<QLabel*>("reasonValue");
+        QVERIFY(reasonValue);
+
+        auto* remediationHeader = dialog.findChild<QLabel*>("remediationHeader");
+        QVERIFY(remediationHeader);
+        auto* remediationValue = dialog.findChild<QLabel*>("remediationValue");
+        QVERIFY(remediationValue);
+    }
+
 };
 
 QTEST_MAIN(DialogsTest)

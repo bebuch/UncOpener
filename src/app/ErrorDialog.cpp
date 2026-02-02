@@ -4,6 +4,7 @@
 
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QStyle>
 #include <QVBoxLayout>
 
@@ -15,6 +16,9 @@ ErrorDialog::ErrorDialog(const QString& inputUrl, const QString& reason, const Q
     setWindowIcon(loadAppIcon());
     setMinimumWidth(450);
     setModal(true);
+
+    QFont boldFont = font();
+    boldFont.setBold(true);
 
     auto* layout = new QVBoxLayout(this);
     layout->setSpacing(15);
@@ -36,21 +40,25 @@ ErrorDialog::ErrorDialog(const QString& inputUrl, const QString& reason, const Q
     // Input URL
     auto* inputGroup = new QVBoxLayout();
     auto* inputHeader = new QLabel("Input:", this);
-    inputHeader->setStyleSheet("font-weight: bold;");
+    inputHeader->setObjectName("inputHeader");
+    inputHeader->setFont(boldFont);
     inputGroup->addWidget(inputHeader);
-    auto* inputValue = new QLabel(inputUrl, this);
-    inputValue->setWordWrap(true);
-    inputValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    inputValue->setStyleSheet("background-color: #f0f0f0; padding: 8px; border-radius: 4px;");
+    auto* inputValue = new QLineEdit(inputUrl, this);
+    inputValue->setObjectName("inputValue");
+    inputValue->setReadOnly(true);
+    // Move cursor to start so long URLs show the beginning
+    inputValue->setCursorPosition(0);
     inputGroup->addWidget(inputValue);
     layout->addLayout(inputGroup);
 
     // Reason
     auto* reasonGroup = new QVBoxLayout();
     auto* reasonHeader = new QLabel("Reason:", this);
-    reasonHeader->setStyleSheet("font-weight: bold;");
+    reasonHeader->setObjectName("reasonHeader");
+    reasonHeader->setFont(boldFont);
     reasonGroup->addWidget(reasonHeader);
     auto* reasonValue = new QLabel(reason, this);
+    reasonValue->setObjectName("reasonValue");
     reasonValue->setWordWrap(true);
     reasonGroup->addWidget(reasonValue);
     layout->addLayout(reasonGroup);
@@ -58,9 +66,11 @@ ErrorDialog::ErrorDialog(const QString& inputUrl, const QString& reason, const Q
     // Remediation
     auto* remediationGroup = new QVBoxLayout();
     auto* remediationHeader = new QLabel("What to do:", this);
-    remediationHeader->setStyleSheet("font-weight: bold;");
+    remediationHeader->setObjectName("remediationHeader");
+    remediationHeader->setFont(boldFont);
     remediationGroup->addWidget(remediationHeader);
     auto* remediationValue = new QLabel(remediation, this);
+    remediationValue->setObjectName("remediationValue");
     remediationValue->setWordWrap(true);
     remediationGroup->addWidget(remediationValue);
     layout->addLayout(remediationGroup);

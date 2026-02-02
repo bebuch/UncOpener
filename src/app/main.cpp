@@ -39,7 +39,14 @@ int runHandlerMode(QApplication& app, const QString& url)
     if (!result.success)
     {
         // Show error dialog
-        ErrorDialog dialog(url, result.errorReason, result.errorRemediation);
+        QString displayUrl = url;
+        const uncopener::UncPath& parsedPath = opener.lastParsedPath();
+        if (!parsedPath.server.isEmpty())
+        {
+            displayUrl = parsedPath.toUncString();
+        }
+
+        ErrorDialog dialog(displayUrl, result.errorReason, result.errorRemediation);
         dialog.exec();
         return 1;
     }
@@ -63,6 +70,7 @@ int runConfigMode(QApplication& app)
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
+    app.setStyle("Fusion");
     app.setApplicationName("UncOpener");
     app.setApplicationVersion("1.0");
     app.setOrganizationName("bebuch");
