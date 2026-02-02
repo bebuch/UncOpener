@@ -18,22 +18,12 @@ private slots:
 
     void testCurrentBinaryPathNotEmpty()
     {
-        // Note: QCoreApplication must exist for applicationFilePath() to work
-        // This is tested via the test runner which provides QCoreApplication
-        if (QCoreApplication::instance() == nullptr)
-        {
-            QSKIP("QCoreApplication not available", SkipSingle);
-        }
         QString path = SchemeRegistry::currentBinaryPath();
         QVERIFY(!path.isEmpty());
     }
 
     void testCurrentBinaryPathIsAbsolute()
     {
-        if (QCoreApplication::instance() == nullptr)
-        {
-            QSKIP("QCoreApplication not available", SkipSingle);
-        }
         QString path = SchemeRegistry::currentBinaryPath();
         // On Windows, absolute paths start with drive letter (e.g., C:)
         // On Linux, they start with /
