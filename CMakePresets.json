@@ -7,64 +7,78 @@
     },
     "configurePresets": [
         {
-            "name": "base",
-            "hidden": true,
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-            }
-        },
-        {
-            "name": "clang-base",
-            "hidden": true,
-            "inherits": "base",
+            "name": "default",
+            "displayName": "Default (Ninja Multi-Config)",
+            "description": "Multi-config build with Ninja, clang, warnings as errors",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++"
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "UNCOPENER_WARNINGS_AS_ERRORS": "ON"
             }
         },
         {
-            "name": "dev",
-            "displayName": "Development (Debug)",
-            "description": "Debug build with clang, warnings as errors",
-            "inherits": "clang-base",
+            "name": "coverage",
+            "displayName": "Coverage",
+            "description": "Debug build with code coverage instrumentation",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/coverage",
             "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_BUILD_TYPE": "Debug",
-                "UNCOPENER_WARNINGS_AS_ERRORS": "ON"
-            }
-        },
-        {
-            "name": "rel",
-            "displayName": "Release",
-            "description": "Release build with clang, warnings as errors",
-            "inherits": "clang-base",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "UNCOPENER_WARNINGS_AS_ERRORS": "ON"
+                "CMAKE_CXX_FLAGS": "--coverage",
+                "CMAKE_EXE_LINKER_FLAGS": "--coverage",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "UNCOPENER_WARNINGS_AS_ERRORS": "OFF"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev"
+            "name": "debug",
+            "displayName": "Debug",
+            "configurePreset": "default",
+            "configuration": "Debug"
         },
         {
-            "name": "rel",
-            "configurePreset": "rel"
+            "name": "release",
+            "displayName": "Release",
+            "configurePreset": "default",
+            "configuration": "Release"
+        },
+        {
+            "name": "coverage",
+            "displayName": "Coverage",
+            "configurePreset": "coverage"
         }
     ],
     "testPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev",
+            "name": "debug",
+            "displayName": "Debug",
+            "configurePreset": "default",
+            "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
             }
         },
         {
-            "name": "rel",
-            "configurePreset": "rel",
+            "name": "release",
+            "displayName": "Release",
+            "configurePreset": "default",
+            "configuration": "Release",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "coverage",
+            "displayName": "Coverage",
+            "configurePreset": "coverage",
             "output": {
                 "outputOnFailure": true
             }

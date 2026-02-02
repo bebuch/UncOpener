@@ -22,67 +22,47 @@ jobs:
 
   build-linux:
     name: Build (Linux)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup C++ toolchain
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: llvm-18
+          cmake: true
+          ninja: true
+          clangtidy: true
+
+      - name: Install Qt and dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            cmake \
-            ninja-build \
-            clang \
-            clang-tidy \
-            qt6-base-dev \
-            qt6-svg-dev \
-            libgl1-mesa-dev \
-            libxkbcommon-dev \
-            lcov
-
-      - name: Configure (Debug)
-        run: cmake --preset dev
-
-      - name: Build
-        run: cmake --build --preset dev -j$(nproc)
-
-      - name: Run tests
-        run: ctest --preset dev --output-on-failure
-
-      - name: Run clang-tidy
-        run: |
-          # Run clang-tidy on all source files (excluding generated files)
-          # WarningsAsErrors is set in .clang-tidy, so any warning will cause failure
-          find src -name '*.cpp' -print0 | xargs -0 run-clang-tidy -p build/dev
-
-  build-linux-release:
-    name: Build (Linux Release)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            cmake \
-            ninja-build \
-            clang \
             qt6-base-dev \
             qt6-svg-dev \
             libgl1-mesa-dev \
             libxkbcommon-dev
 
-      - name: Configure (Release)
-        run: cmake --preset rel
+      - name: Configure
+        run: cmake --preset default
 
-      - name: Build
-        run: cmake --build --preset rel -j$(nproc)
+      - name: Build (Debug)
+        run: cmake --build --preset debug
 
-      - name: Run tests
-        run: ctest --preset rel --output-on-failure
+      - name: Test (Debug)
+        run: ctest --preset debug
+
+      - name: Build (Release)
+        run: cmake --build --preset release
+
+      - name: Test (Release)
+        run: ctest --preset release
+
+      - name: Run clang-tidy
+        run: |
+          # Run clang-tidy on all source files (excluding generated files)
+          # WarningsAsErrors is set in .clang-tidy, so any warning will cause failure
+          find src -name '*.cpp' -print0 | xargs -0 run-clang-tidy -p build
 
   build-windows:
     name: Build (Windows)
@@ -90,55 +70,65 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup C++ toolchain
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: llvm-18
+          cmake: true
+          ninja: true
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.6.*'
           archives: 'qtbase qtsvg'
 
-      - name: Configure (Release)
-        run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+      - name: Configure
+        run: cmake --preset default
 
-      - name: Build
-        run: cmake --build build --config Release --parallel
+      - name: Build (Debug)
+        run: cmake --build --preset debug
 
-      - name: Run tests
-        run: ctest --test-dir build --build-config Release --output-on-failure
+      - name: Test (Debug)
+        run: ctest --preset debug
+
+      - name: Build (Release)
+        run: cmake --build --preset release
+
+      - name: Test (Release)
+        run: ctest --preset release
 
   coverage:
     name: Code Coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup C++ toolchain
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: llvm-18
+          cmake: true
+          ninja: true
+
+      - name: Install Qt and dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            cmake \
-            ninja-build \
-            clang \
-            llvm \
             qt6-base-dev \
             qt6-svg-dev \
             libgl1-mesa-dev \
             libxkbcommon-dev \
             lcov
 
-      - name: Configure with coverage
-        run: |
-          cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DCMAKE_CXX_FLAGS="--coverage" \
-            -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+      - name: Configure
+        run: cmake --preset coverage
 
       - name: Build
-        run: cmake --build build -j$(nproc)
+        run: cmake --build --preset coverage
 
       - name: Run tests
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --preset coverage
 
       - name: Generate coverage report
         run: |
@@ -149,7 +139,7 @@ jobs:
           EOF
           chmod +x llvm-gcov.sh
 
-          lcov --capture --directory build --output-file coverage.info \
+          lcov --capture --directory build/coverage --output-file coverage.info \
             --gcov-tool "$PWD/llvm-gcov.sh" \
             --ignore-errors mismatch,inconsistent
           lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' \
@@ -164,8 +154,9 @@ jobs:
           path: coverage.info
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.info
           fail_ci_if_error: false
           verbose: true

@@ -27,9 +27,9 @@ Examples:
 ### Building
 
 ```powershell
-# Build in Release mode
-cmake --preset rel
-cmake --build --preset rel
+# Configure and build in Release mode
+cmake --preset default
+cmake --build --preset release
 
 # Create ZIP package
 powershell -ExecutionPolicy Bypass -File packaging/package-windows.ps1
@@ -59,9 +59,9 @@ Scheme registration is per-user (HKEY_CURRENT_USER) and works without admin righ
 ### Building
 
 ```bash
-# Build in Release mode
-cmake --preset rel
-cmake --build --preset rel
+# Configure and build in Release mode
+cmake --preset default
+cmake --build --preset release
 
 # Create AppImage
 ./packaging/package-linux.sh
@@ -122,15 +122,15 @@ The packaging scripts are designed to work in CI environments:
 - name: Package (Windows)
   if: runner.os == 'Windows'
   run: |
-    cmake --preset rel
-    cmake --build --preset rel
+    cmake --preset default
+    cmake --build --preset release
     powershell -File packaging/package-windows.ps1
 
 - name: Package (Linux)
   if: runner.os == 'Linux'
   run: |
-    cmake --preset rel
-    cmake --build --preset rel
+    cmake --preset default
+    cmake --build --preset release
     ./packaging/package-linux.sh
 ```
 

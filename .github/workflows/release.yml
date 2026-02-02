@@ -15,14 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup C++ toolchain
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: llvm-18
+          cmake: true
+          ninja: true
+
+      - name: Install Qt and dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            cmake \
-            ninja-build \
-            clang \
             qt6-base-dev \
             qt6-svg-dev \
             libgl1-mesa-dev \
@@ -31,14 +34,14 @@ jobs:
             wget \
             file
 
-      - name: Configure (Release)
-        run: cmake --preset rel
+      - name: Configure
+        run: cmake --preset default
 
-      - name: Build
-        run: cmake --build --preset rel -j$(nproc)
+      - name: Build (Release)
+        run: cmake --build --preset release
 
       - name: Run tests
-        run: ctest --preset rel --output-on-failure
+        run: ctest --preset release
 
       - name: Create AppImage
         run: ./packaging/package-linux.sh
@@ -55,20 +58,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup C++ toolchain
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: llvm-18
+          cmake: true
+          ninja: true
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.6.*'
           archives: 'qtbase qtsvg'
 
-      - name: Configure (Release)
-        run: cmake -B build/rel -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+      - name: Configure
+        run: cmake --preset default
 
-      - name: Build
-        run: cmake --build build/rel --config Release --parallel
+      - name: Build (Release)
+        run: cmake --build --preset release
 
       - name: Run tests
-        run: ctest --test-dir build/rel --build-config Release --output-on-failure
+        run: ctest --preset release
 
       - name: Package
         shell: pwsh
@@ -76,7 +86,7 @@ jobs:
           # Set Qt6_DIR for windeployqt
           $env:Qt6_DIR = "$env:Qt6_Dir"
           # Run packaging script
-          .\packaging\package-windows.ps1 -BuildDir "build\rel" -OutputDir "dist"
+          .\packaging\package-windows.ps1 -BuildDir "build" -OutputDir "dist"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

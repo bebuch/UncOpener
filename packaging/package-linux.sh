@@ -15,7 +15,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 VERSION="1.0"
 APP_NAME="UncOpener"
-BUILD_DIR="${PROJECT_ROOT}/build/rel"
+BUILD_DIR="${PROJECT_ROOT}/build"
 OUTPUT_DIR="${PROJECT_ROOT}/dist"
 APPDIR="${OUTPUT_DIR}/AppDir"
 
@@ -26,12 +26,12 @@ echo "Output directory: ${OUTPUT_DIR}"
 echo ""
 
 # Check for the executable
-EXECUTABLE="${BUILD_DIR}/src/app/uncopener"
+EXECUTABLE="${BUILD_DIR}/Release/src/app/uncopener"
 if [ ! -f "$EXECUTABLE" ]; then
     echo "ERROR: Cannot find uncopener executable at ${EXECUTABLE}"
     echo "Make sure you have built the project with Release configuration:"
-    echo "  cmake --preset rel"
-    echo "  cmake --build --preset rel"
+    echo "  cmake --preset default"
+    echo "  cmake --build --preset release"
     exit 1
 fi
 
