@@ -168,12 +168,23 @@ void MainWindow::setupUi()
 void MainWindow::loadConfig()
 {
     m_config.load();
+    m_savedConfigJson = m_config.toJsonBytes();
     updateUiFromConfig();
-    setModified(false);
 }
 
 void MainWindow::updateUiFromConfig()
 {
+    // Block signals on all input widgets to prevent premature validation
+    // during UI population
+    m_schemeNameEdit->blockSignals(true);
+    m_filetypeModeCombo->blockSignals(true);
+#ifndef Q_OS_WIN
+    if (m_smbUsernameEdit != nullptr)
+    {
+        m_smbUsernameEdit->blockSignals(true);
+    }
+#endif
+
     m_schemeNameEdit->setText(m_config.schemeName());
 
     m_uncAllowList->clear();
@@ -188,6 +199,16 @@ void MainWindow::updateUiFromConfig()
     if (m_smbUsernameEdit != nullptr)
     {
         m_smbUsernameEdit->setText(m_config.smbUsername());
+    }
+#endif
+
+    // Re-enable signals
+    m_schemeNameEdit->blockSignals(false);
+    m_filetypeModeCombo->blockSignals(false);
+#ifndef Q_OS_WIN
+    if (m_smbUsernameEdit != nullptr)
+    {
+        m_smbUsernameEdit->blockSignals(false);
     }
 #endif
 
@@ -257,42 +278,42 @@ void MainWindow::updateConfigFromUi()
 #endif
 }
 
+bool MainWindow::hasUnsavedChanges()
+{
+    updateConfigFromUi();
+    return m_config.toJsonBytes() != m_savedConfigJson;
+}
+
 void MainWindow::validateAndUpdateStatus()
 {
-    QString status;
-    bool hasWarnings = false;
+    QPalette palette = m_statusLabel->palette();
+    QString title = "UncOpener - Configuration";
 
     if (m_schemeNameEdit->text().trimmed().isEmpty())
     {
-        status = "Warning: Scheme name is empty";
-        hasWarnings = true;
+        // Invalid: scheme name is empty
+        palette.setColor(QPalette::WindowText, Qt::red);
+        m_statusLabel->setText("Invalid: Scheme name is empty");
+        m_saveButton->setEnabled(false);
+        title += " *";
     }
-
-    QPalette palette = m_statusLabel->palette();
-    if (hasWarnings)
+    else if (hasUnsavedChanges())
     {
-        palette.setColor(QPalette::WindowText, QColor(255, 140, 0)); // Dark orange
+        // Unsaved changes
+        palette.setColor(QPalette::WindowText, Qt::red);
+        m_statusLabel->setText("Unsaved changes");
+        m_saveButton->setEnabled(true);
+        title += " *";
     }
     else
     {
-        status = "Configuration valid";
-        palette.setColor(QPalette::WindowText, Qt::blue); // Use blue for valid state to be safe
+        // Configuration saved
+        palette.setColor(QPalette::WindowText, Qt::darkGreen);
+        m_statusLabel->setText("Configuration saved");
+        m_saveButton->setEnabled(false);
     }
+
     m_statusLabel->setPalette(palette);
-
-    m_statusLabel->setText(status);
-}
-
-void MainWindow::setModified(bool modified)
-{
-    m_modified = modified;
-    m_saveButton->setEnabled(modified);
-
-    QString title = "UncOpener - Configuration";
-    if (modified)
-    {
-        title += " *";
-    }
     setWindowTitle(title);
 }
 
@@ -302,11 +323,8 @@ void MainWindow::onSaveClicked()
 
     if (m_config.save())
     {
-        setModified(false);
-        m_statusLabel->setText("Configuration saved");
-        QPalette palette = m_statusLabel->palette();
-        palette.setColor(QPalette::WindowText, Qt::darkGreen);
-        m_statusLabel->setPalette(palette);
+        m_savedConfigJson = m_config.toJsonBytes();
+        validateAndUpdateStatus();
     }
     else
     {
@@ -318,7 +336,6 @@ void MainWindow::onSaveClicked()
 
 void MainWindow::onSchemeNameChanged(const QString& /*text*/)
 {
-    setModified(true);
     validateAndUpdateStatus();
     updateRegistrationStatus();
 }
@@ -342,7 +359,6 @@ void MainWindow::onAddUncEntry()
     entry = uncopener::UncAllowList::normalizeEntry(entry);
     m_uncAllowList->addItem(entry);
     m_uncEntryEdit->clear();
-    setModified(true);
     validateAndUpdateStatus();
 }
 
@@ -352,7 +368,6 @@ void MainWindow::onRemoveUncEntry()
     if (item != nullptr)
     {
         delete m_uncAllowList->takeItem(m_uncAllowList->row(item));
-        setModified(true);
         validateAndUpdateStatus();
     }
 }
@@ -363,7 +378,6 @@ void MainWindow::onFiletypeModeChanged(int /*index*/)
     updateConfigFromUi();
     // Update the list display for the new mode
     updateFiletypeListFromMode();
-    setModified(true);
     validateAndUpdateStatus();
 }
 
@@ -385,11 +399,11 @@ void MainWindow::onAddFiletypeEntry()
     entry = uncopener::FiletypePolicy::normalizeExtension(entry);
     m_filetypeListWidget->addItem(entry);
     m_filetypeEntryEdit->clear();
-    setModified(true);
 
     // Update config and refresh mode combo state
     updateConfigFromUi();
     m_filetypeModeCombo->setEnabled(m_filetypeListWidget->count() == 0);
+    validateAndUpdateStatus();
 }
 
 void MainWindow::onRemoveFiletypeEntry()
@@ -398,17 +412,17 @@ void MainWindow::onRemoveFiletypeEntry()
     if (item != nullptr)
     {
         delete m_filetypeListWidget->takeItem(m_filetypeListWidget->row(item));
-        setModified(true);
 
         // Update config and refresh mode combo state
         updateConfigFromUi();
         m_filetypeModeCombo->setEnabled(m_filetypeListWidget->count() == 0);
+        validateAndUpdateStatus();
     }
 }
 
 void MainWindow::onSmbUsernameChanged(const QString& /*text*/)
 {
-    setModified(true);
+    validateAndUpdateStatus();
 }
 
 void MainWindow::updateRegistrationStatus()

@@ -82,6 +82,56 @@ private slots:
         QCOMPARE(json["filetypeBlacklist"].toArray().size(), 2);
     }
 
+    void testToJsonBytes()
+    {
+        Config config;
+        config.setSchemeName("bytestest");
+        config.setUncAllowList({R"(\\server\share)"});
+
+        QByteArray bytes = config.toJsonBytes();
+
+        // Should be valid JSON
+        QVERIFY(!bytes.isEmpty());
+
+        // Should be parseable
+        QJsonDocument doc = QJsonDocument::fromJson(bytes);
+        QVERIFY(!doc.isNull());
+        QVERIFY(doc.isObject());
+
+        QJsonObject json = doc.object();
+        QCOMPARE(json["schemeName"].toString(), QString("bytestest"));
+    }
+
+    void testToJsonBytesComparison()
+    {
+        // Two configs with same values should produce same JSON bytes
+        Config config1;
+        config1.setSchemeName("compare");
+        config1.setUncAllowList({R"(\\server\share)"});
+        config1.setFiletypeMode(FiletypeMode::Whitelist);
+        config1.setFiletypeWhitelist({".txt"});
+
+        Config config2;
+        config2.setSchemeName("compare");
+        config2.setUncAllowList({R"(\\server\share)"});
+        config2.setFiletypeMode(FiletypeMode::Whitelist);
+        config2.setFiletypeWhitelist({".txt"});
+
+        QCOMPARE(config1.toJsonBytes(), config2.toJsonBytes());
+    }
+
+    void testToJsonBytesDifferentConfigs()
+    {
+        // Two configs with different values should produce different JSON bytes
+        Config config1;
+        config1.setSchemeName("first");
+
+        Config config2;
+        config2.setSchemeName("second");
+
+        QVERIFY(config1.toJsonBytes() != config2.toJsonBytes());
+    }
+
     void testJsonDeserialization()
     {
         QJsonObject json;

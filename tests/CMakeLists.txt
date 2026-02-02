@@ -45,9 +45,11 @@ set_tests_properties(uncopener_resource_tests PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
 
-# Test for dialog and window icons
+# Test for dialog and window icons and MainWindow workflows
 add_executable(uncopener_gui_tests
+    test_gui_main.cpp
     test_dialogs.cpp
+    test_mainwindow.cpp
     ../src/app/ErrorDialog.cpp
     ../src/app/ErrorDialog.hpp
     ../src/app/MainWindow.cpp
