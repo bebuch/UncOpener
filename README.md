@@ -52,16 +52,30 @@ Pre-built binaries are available on the [Releases](https://github.com/bebuch/Unc
 
 ### Requirements
 
-- C++17 compatible compiler (Clang recommended)
+- C++17 compatible compiler (Clang 18 recommended)
 - CMake 3.20+
+- Ninja
 - Qt 6
 
 ### Build Instructions
 
+This project uses CMake presets with Ninja Multi-Config. All builds are done from the source directory:
+
 ```bash
-cmake --preset dev
-cmake --build --preset dev
-ctest --preset dev
+# Configure (one-time, creates build/ directory)
+cmake --preset default
+
+# Build Debug
+cmake --build --preset debug
+
+# Build Release
+cmake --build --preset release
+
+# Run tests (Debug)
+ctest --preset debug
+
+# Run tests (Release)
+ctest --preset release
 ```
 
 ## Configuration

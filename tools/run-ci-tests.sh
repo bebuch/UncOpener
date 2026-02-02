@@ -17,21 +17,29 @@ fi
 echo "Format check passed."
 echo
 
-echo "=== Configure (Debug) ==="
-cmake --preset dev
+echo "=== Configure ==="
+cmake --preset default
 echo
 
-echo "=== Build ==="
-cmake --build --preset dev -j$(nproc)
+echo "=== Build (Debug) ==="
+cmake --build --preset debug
 echo
 
-echo "=== Run Tests ==="
+echo "=== Test (Debug) ==="
 # QT_QPA_PLATFORM=offscreen is set via CMake's set_tests_properties()
-ctest --preset dev --output-on-failure
+ctest --preset debug
+echo
+
+echo "=== Build (Release) ==="
+cmake --build --preset release
+echo
+
+echo "=== Test (Release) ==="
+ctest --preset release
 echo
 
 echo "=== Run clang-tidy ==="
-find src -name '*.cpp' | xargs clang-tidy -p build/dev
+find src -name '*.cpp' | xargs clang-tidy -p build
 echo
 
 echo "=== All CI checks passed ==="

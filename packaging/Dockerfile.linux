@@ -33,7 +33,7 @@ WORKDIR /src
 
 # Default command: build and package
 CMD ["sh", "-c", "\
-    cmake --preset rel && \
-    cmake --build --preset rel && \
+    cmake --preset default && \
+    cmake --build --preset release && \
     ./packaging/package-linux.sh \
 "]
