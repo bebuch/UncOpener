@@ -1,10 +1,5 @@
 option(UNCOPENER_ENABLE_CLANG_TIDY "Enable clang-tidy static analysis" ON)
 
-# Disable clang-tidy on Windows by default (MSVC STL version requirements)
-if(WIN32)
-    set(UNCOPENER_ENABLE_CLANG_TIDY OFF)
-endif()
-
 if(UNCOPENER_ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXECUTABLE clang-tidy)
 
