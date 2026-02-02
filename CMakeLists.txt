@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 project(UncOpener VERSION 1.0 LANGUAGES CXX)
 
+# Enforce Ninja Multi-Config generator (required for this project)
+if(NOT CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
+    message(FATAL_ERROR
+        "This project requires the 'Ninja Multi-Config' generator.\n"
+        "Please configure with: cmake --preset default\n"
+        "Current generator: ${CMAKE_GENERATOR}"
+    )
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

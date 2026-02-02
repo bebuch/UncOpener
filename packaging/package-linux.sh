@@ -25,11 +25,13 @@ echo "Build directory: ${BUILD_DIR}"
 echo "Output directory: ${OUTPUT_DIR}"
 echo ""
 
-# Check for the executable
-EXECUTABLE="${BUILD_DIR}/Release/src/app/uncopener"
+# Check for the executable (Ninja Multi-Config: build/<target-dir>/<config>/<executable>)
+EXECUTABLE="${BUILD_DIR}/src/app/Release/uncopener"
 if [ ! -f "$EXECUTABLE" ]; then
     echo "ERROR: Cannot find uncopener executable at ${EXECUTABLE}"
-    echo "Make sure you have built the project with Release configuration:"
+    echo ""
+    echo "This project exclusively supports Ninja Multi-Config."
+    echo "Build with the following commands:"
     echo "  cmake --preset default"
     echo "  cmake --build --preset release"
     exit 1
